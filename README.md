@@ -5,14 +5,13 @@
 Shengji is a Chinese point-based card game I learned from friends and family. Rules and details can be found on [Wikipedia](https://en.wikipedia.org/wiki/Sheng_ji), although house rules and terminology will be updated in here later on regarding the actual implementation, because there is a lot of setup to it.
 
 
-This project is intended to be a live interaction between multiple clients (players) and the server. Users can log in and view their own/others stats (i.e. rounds won, games won). Games are be created/joined in the home page. Users wait in a game's lobby--users join a game with/without a password. The game can start after 4+ players have joined, and users can choose the mode (regular Shengji or an alternative version, Zhaopengyou) as well as the number of decks. Games can be "paused" between rounds, and users can be in multiple games at once, but once a Game is created, the players cannot change. Additionally, a paused Game would not start unless all players are joined in the group lobby.
+This project is intended to be a live interaction between multiple clients (players) and the server. Users can log in and view their own/others stats (i.e. rounds won, games won). Games are created/displayed from the home page. Users wait in a game's lobby--users join a game with/without a password. The game can start after 4+ players have joined, and users can choose the mode (regular Shengji or an alternative version, Zhaopengyou) as well as the number of decks. Games can be "paused" between rounds, and users can be in multiple games at once, but once a Game is created, the players cannot change. Additionally, a paused Game would not start unless all players are joined in the group lobby.
 
 ## Data Model
 
 The application will store Players, and Games, both related by references.
 * Players can have multiple Games
 * Games will have multiple Players, the ids of which are in an embedded object
-* Games also have embedded card objects, but these won't be a collection themselves since their values are static and final
 
 An Example Player:
 
@@ -57,13 +56,13 @@ An Example Game:
 
 ![homepage](documentation/homepage.png)
 
-* /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining; once the game starts, the page will reload to display the actual game
+* /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining; once the game starts, the page will reload to display the actual game. Between rounds, there will be a button that allows a user to leave the game--then all users are booted from the game and the progress gets saved to the db.
 
 ![game lobby](documentation/game-lobby.png)
 ![game](documentation/game.png)
 ![game end round](documentation/game-end-round.png)
 
-* /user/[username] - a page showing the users stats; if own user, there is an option to edit the description
+* /user/[username] - a page showing the users stats; if own user, there is an option to edit the description, and to rejoin a paused game
 
 ![user stats](documentation/user-stats.png)
 ![self stats](documentation/self-stats.png)
@@ -85,17 +84,20 @@ An Example Game:
   * logout -> '/' and logs out
 * /
   * make a new game -> popup with form to create new game
-    * create -> POST req to create the game, redirect to '/game/[game-slug]'
+      * create -> POST req to create the game, redirect to '/game/[game-slug]'
   * join game -> popup with password and/or join button
-    * join (SUCCESS) -> redirect to '/game/[game-slug]'
-    * join (FAIL) -> reload with error message
+      * join (SUCCESS) -> redirect to '/game/[game-slug]'
+      * join (FAIL) -> reload with error message
   * [username] -> '/user/[username]'
 * /game/[game-slug]
   * start (disabled until # players >= 4) -> reload page
+  * delete game -> redirect to '/', deletes game
   * [username] -> popup with cards that player has played
   * [points collected] -> popup with cards that have been collected
+  * end game -> redirects all players to '/', saves game
 * /user/[username]
   * edit (for own page) -> reload with bio as text input & option to save
+  * rejoin (for own page) -> redirect to '/game/[game-slug]'
 * /scoreboard
   * [username] -> '/user/[username]'
 
