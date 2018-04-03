@@ -54,13 +54,14 @@ An Example Game:
 ## Wireframes
 
 * / - the home page, shows all games that can be joined, and option to create a new game; clicking on a game gives a "pop up" where you input a password if necessary, or else just a button
- 
+
 ![homepage](documentation/homepage.png)
 
 * /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining; once the game starts, the page will reload to display the actual game
 
-![game-lobby](documentation/game-lobby.png)
+![game lobby](documentation/game-lobby.png)
 ![game](documentation/game.png)
+![game end round](documentation/game-end-round.png)
 
 * /user/[username] - a page showing the users stats; if own user, there is an option to edit the description
 
