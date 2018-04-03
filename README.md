@@ -1,116 +1,134 @@
-The content below is an example project proposal / requirements document. Replace the text below the lines marked "__TODO__" with details specific to your project. Remove the "TODO" lines.
-
-(___TODO__: your project name_)
-
-# Shoppy Shoperson 
+# Shengji
 
 ## Overview
 
-(___TODO__: a brief one or two paragraph, high-level description of your project_)
+Shengji is a Chinese point-based card game I learned from friends and family. Rules and details can be found on [Wikipedia](https://en.wikipedia.org/wiki/Sheng_ji), although house rules and terminology will be updated in here later on regarding the actual implementation, because there is a lot of setup to it.
 
-Remembering what to buy at the grocery store is waaaaay too difficult. Also, shopping for groceries when you're hungry leads to regrettable purchases. Sooo... that's where Shoppy Shoperson comes in!
 
-Shoppy Shoperson is a web app that will allow users to keep track of multiple grocery lists. Users can register and login. Once they're logged in, they can create or view their grocery list. For every list that they have, they can add items to the list or cross off items.
-
+This project is intended to be a live interaction between multiple clients (players) and the server. Users can log in and view their own/others stats (i.e. rounds won, games won). Games are be created/joined in the home page. Users wait in a game's lobby--users join a game with/without a password. The game can start after 4+ players have joined, and users can choose the mode (regular Shengji or an alternative version, Zhaopengyou) as well as the number of decks. Games can be "paused" between rounds, and users can be in multiple games at once, but once a Game is created, the players cannot change. Additionally, a paused Game would not start unless all players are joined in the group lobby.
 
 ## Data Model
 
-(___TODO__: a description of your application's data and their relationships to each other_) 
+The application will store Players, and Games, both related by references.
+* Players can have multiple Games
+* Games will have multiple Players, the ids of which are in an embedded object
+* Games also have embedded card objects, but these won't be a collection themselves since their values are static and final
 
-The application will store Users, Lists and Items
-
-* users can have multiple lists (via references)
-* each list can have multiple items (by embedding)
-
-(___TODO__: sample documents_)
-
-An Example User:
+An Example Player:
 
 ```javascript
 {
-  username: "shannonshopper",
-  hash: // a password hash,
-  lists: // an array of references to List documents
+  username: 'ultimategamer'
+  password: // a password hash
+  description: 'hi, i\'m ultimategamer and i like to play this game a lot. also i\'m ultimate at it.'
+  roundWins: 100
+  gameWins: 50
+  games: // an array of references to Game documents
+  usersPlayedWith: [{
+    user: // reference to Player document
+    times: 1,
+  }]
+  _id: // unique, preset
 }
 ```
 
-An Example List with Embedded Items:
+An Example Game:
 
 ```javascript
 {
-  user: // a reference to a User object
-  name: "Breakfast foods",
-  items: [
-    { name: "pancakes", quantity: "9876", checked: false},
-    { name: "ramen", quantity: "2", checked: true},
-  ],
-  createdAt: // timestamp
+  name: 'game for n00bs' // required
+  mode: // enum: Shengji/Zhaopengyou
+  numDecks: 3
+  password: // a password hash
+  users: [{ // required
+    user: // a reference to a Player document
+    level: // the level they are on within the game
+  }],
+  host: // the host of the next round
+  slug: 'game-for-n00bs' // generated
 }
 ```
 
-
-## [Link to Commented First Draft Schema](db.js) 
-
-(___TODO__: create a first draft of your Schemas in db.js and link to it_)
+## [Link to Commented First Draft Schema](src/db.js)
 
 ## Wireframes
 
-(___TODO__: wireframes for all of the pages on your site; they can be as simple as photos of drawings or you can use a tool like Balsamiq, Omnigraffle, etc._)
+* / - the home page, shows all games that can be joined, and option to create a new game
+    clicking on a game gives a "pop up" where you input a password if necessary, or else just a button
+![homepage](documentation/homepage.png)
 
-/list/create - page for creating a new shopping list
+* /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining
+    once the game starts, the page will reload to display the actual game
+![game-lobby](documentation/game-lobby.png)
+![game](documentation/game.png)
 
-![list create](documentation/list-create.png)
+* /user/[username] - a page showing the users stats; if own user, there is an option to edit the description
+![user stats](documentation/user-stats.png)
+![self stats](documentation/self-stats.png)
 
-/list - page for showing all shopping lists
+* /scoreboard - showing the top 3 users with highest game wins, and top 3 users with highest round wins
+![scoreboard](documentation/scoreboard.png)
 
-![list](documentation/list.png)
+* /login
+* /register
+![login/register](documentation/login-register.png)
 
-/list/slug - page for showing specific shopping list
-
-![list](documentation/list-slug.png)
 
 ## Site map
 
-(___TODO__: draw out a site map that shows how pages are related to each other_)
-
-Here's a [complex example from wikipedia](https://upload.wikimedia.org/wikipedia/commons/2/20/Sitemap_google.jpg), but you can create one without the screenshots, drop shadows, etc. ... just names of pages and where they flow to.
+* all pages
+  * scoreboard -> '/scoreboard'
+  * login -> '/login', register -> '/register'
+  * logout -> '/' and logs out
+* /
+  * make a new game -> popup with form to create new game
+    * create -> POST req to create the game, redirect to '/game/[game-slug]'
+  * join game -> popup with password and/or join button
+    * join (SUCCESS) -> redirect to '/game/[game-slug]'
+    * join (FAIL) -> reload with error message
+  * [username] -> '/user/[username]'
+* /game/[game-slug]
+  * start (disabled until # players >= 4) -> reload page
+  * [username] -> popup with cards that player has played
+  * [points collected] -> popup with cards that have been collected
+* /user/[username]
+  * edit (for own page) -> reload with bio as text input & option to save
+* /scoreboard
+  * [username] -> '/user/[username]'
 
 ## User Stories or Use Cases
 
-(___TODO__: write out how your application will be used through [user stories](http://en.wikipedia.org/wiki/User_story#Format) and / or [use cases](https://www.mongodb.com/download-center?jmp=docs&_ga=1.47552679.1838903181.1489282706#previous)_)
-
-1. as non-registered user, I can register a new account with the site
-2. as a user, I can log in to the site
-3. as a user, I can create a new grocery list
-4. as a user, I can view all of the grocery lists I've created in a single list
-5. as a user, I can add items to an existing grocery list
-6. as a user, I can cross off items in an existing grocery list
+1. As non-registered user:
+  1. register a new account with the site
+  2. view the list of games on the home page
+  3. view the scoreboard
+  4. view user stats
+2. As a registered user:
+  1. log in to the site
+  2. create a game
+  3. join a game
+  4. play a game
+  5. view the list of games on the home page
+  6. view the scoreboard
+  7. view user stats
+  8. edit own user description
 
 ## Research Topics
 
-(___TODO__: the research topics that you're planning on working on along with their point values... and the total points of research topics listed_)
-
 * (5 points) Integrate user authentication
-    * I'm going to be using passport for user authentication
-    * And account has been made for testing; I'll email you the password
-    * see <code>cs.nyu.edu/~jversoza/ait-final/register</code> for register page
-    * see <code>cs.nyu.edu/~jversoza/ait-final/login</code> for login page
-* (4 points) Perform client side form validation using a JavaScript library
-    * see <code>cs.nyu.edu/~jversoza/ait-final/my-form</code>
-    * if you put in a number that's greater than 5, an error message will appear in the dom
-* (5 points) vue.js
-    * used vue.js as the frontend framework; it's a challenging library to learn, so I've assigned it 5 points
+    * use passport for user authentication
+* (3 points) Perform client side form validation custom JavaScript
+    * during the game, there are some rules to your play relative to the first play of the turn
+      * e.g. if you have cards in the suit they played, you must play cards in that suit
+      * e.g. if the first player played a pair of hearts and you have a pair hearts, you must play them
+      * these rules will be added to the README later on
+* (4 points) Use ReactJS
+    * use ReactJS as the frontend framework
 
-10 points total out of 8 required points (___TODO__: addtional points will __not__ count for extra credit_)
+12 points total out of 8 required points
 
-
-## [Link to Initial Main Project File](app.js) 
-
-(___TODO__: create a skeleton Express application with a package.json, app.js, views folder, etc. ... and link to your initial app.js_)
+## [Link to Initial Main Project File](src/app.js)
 
 ## Annotations / References Used
 
-(___TODO__: list any tutorials/references/etc. that you've based your code off of_)
-
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
+(__TODO__: list any tutorials/references/etc. that you've based your code off of_)
