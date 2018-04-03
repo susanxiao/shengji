@@ -53,26 +53,28 @@ An Example Game:
 
 ## Wireframes
 
-* / - the home page, shows all games that can be joined, and option to create a new game
-    clicking on a game gives a "pop up" where you input a password if necessary, or else just a button
+* / - the home page, shows all games that can be joined, and option to create a new game; clicking on a game gives a "pop up" where you input a password if necessary, or else just a button
+ 
 ![homepage](documentation/homepage.png)
 
-* /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining
-    once the game starts, the page will reload to display the actual game
+* /game/[game-slug] - the game lobby, users are directed here after submitting the correct password/joining; once the game starts, the page will reload to display the actual game
+
 ![game-lobby](documentation/game-lobby.png)
 ![game](documentation/game.png)
 
 * /user/[username] - a page showing the users stats; if own user, there is an option to edit the description
+
 ![user stats](documentation/user-stats.png)
 ![self stats](documentation/self-stats.png)
 
 * /scoreboard - showing the top 3 users with highest game wins, and top 3 users with highest round wins
+
 ![scoreboard](documentation/scoreboard.png)
 
 * /login
 * /register
-![login/register](documentation/login-register.png)
 
+![login/register](documentation/login-register.png)
 
 ## Site map
 
@@ -99,19 +101,19 @@ An Example Game:
 ## User Stories or Use Cases
 
 1. As non-registered user:
-  1. register a new account with the site
-  2. view the list of games on the home page
-  3. view the scoreboard
-  4. view user stats
+    1. register a new account with the site
+    2. view the list of games on the home page
+    3. view the scoreboard
+    4. view user stats
 2. As a registered user:
-  1. log in to the site
-  2. create a game
-  3. join a game
-  4. play a game
-  5. view the list of games on the home page
-  6. view the scoreboard
-  7. view user stats
-  8. edit own user description
+    1. log in to the site
+    2. create a game
+    3. join a game
+    4. play a game
+    5. view the list of games on the home page
+    6. view the scoreboard
+    7. view user stats
+    8. edit own user description
 
 ## Research Topics
 
