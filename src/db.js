@@ -1,4 +1,3 @@
-/*
 const mongoose = require('mongoose');
 const URLSlugs = require('mongoose-url-slugs');
 
@@ -43,9 +42,9 @@ const Game = new mongoose.Schema({
 Game.plugin(URLSlugs('name'));
 mongoose.model('Game', Game);
 
+// TODO: not this
 mongoose.connect('mongodb://localhost/final-proj');
 
 module.exports = {
     mongoose: mongoose
 };
-*/
