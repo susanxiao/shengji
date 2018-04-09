@@ -26,13 +26,13 @@ app.use(
   }),
   flash(),
   passport.initialize(),
-  passport.session()
+  passport.session(),
   (req, res, next) => {
     if (req.isAuthenticated()) {
       res.locals.loggedIn = true;
       res.locals.username = req.user.username;
     } else {
-      req.locals.loggedIn = false;
+      res.locals.loggedIn = false;
       delete res.locals.username;
     }
     next();
@@ -59,6 +59,39 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+app.get('/scoreboard', (req, res) => {
+  // reference: https://docs.mongodb.com/manual/reference/method/cursor.sort/
+  // reference: https://stackoverflow.com/questions/5830513/how-do-i-limit-the-number-of-returned-items
+  Player.find().sort({'roundWins': -1}).limit(3).exec((err, rounds) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      Player.find().sort({'gameWins': -1}).limit(3).exec((err1, games) => {
+        if (err1) {
+          console.log(err1);
+          res.status(500).send('Internal Server Error');
+        } else {
+          res.render('scoreboard.hbs', {
+            rounds: rounds.map(round => {
+              return {
+                username: round.username,
+                wins: round.roundWins
+              };
+            }),
+            games: games.map(game => {
+              return {
+                username: game.username,
+                wins: game.gameWins
+              };
+            })
+          });
+        }
+      });
+    }
+  });
+});
+
 app.post('/login', passport.authenticate('local-login', {
   successRedirect: '/',
   failureRedirect: '/login',
@@ -72,8 +105,6 @@ app.post('/register', passport.authenticate('local-signup', {
 }));
 
 /*
-* all pages
-  * scoreboard -> '/scoreboard'
 * /
   * make a new game -> popup with form to create new game
       * create -> POST req to create the game, redirect to '/game/[game-slug]'
@@ -90,8 +121,6 @@ app.post('/register', passport.authenticate('local-signup', {
 * /user/[username]
   * edit (for own page) -> reload with bio as text input & option to save
   * rejoin (for own page) -> redirect to '/game/[game-slug]'
-* /scoreboard
-  * [username] -> '/user/[username]'
 */
 
 app.listen(3000);

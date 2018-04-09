@@ -2,10 +2,14 @@
 <html>
 <head>
   <link rel='stylesheet' href='/css/base.css' type='text/css' />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous">
 </head>
 <body>
   <div id='header'>
-    <a href='/scoreboard'>Scoreboard</a>
+    <div>
+      <a href='/scoreboard'>Scoreboard</a> |
+      <a href='/'>Games</a>
+    </div>
     <div>
       {{#if loggedIn}}
         <span>{{username}}</span> |

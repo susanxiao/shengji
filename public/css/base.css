@@ -12,6 +12,10 @@ body, form, #body {
   margin: 0;
 }
 
+h1 {
+  text-transform: lowercase;
+}
+
 #games {
   display: flex;
   flex-direction: row;
@@ -19,10 +23,11 @@ body, form, #body {
   justify-content: center;
   width: 100%;
   margin: 10px;
+  overflow-y:auto;
 }
 
 #games > div {
-  border: 1px solid black;
+  border-bottom: 1px solid #999;
   flex-basis: 50%;
   justify-content: flex-start;
   padding: 10px;
@@ -37,6 +42,30 @@ body, form, #body {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+#scoreboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 10px;
+}
+
+#round-wins, #game-wins {
+  flex-basis: 50%;
+  justify-content: center;
+}
+
+#round-wins > div, #game-wins > div {
+  border-bottom: 1px solid #999;
+  margin: 10px 0px;
+  padding: 10px;
+}
+
+#round-wins > div > *, #game-wins > div > * {
+  margin: 10px;
 }
 
 form > #error {
@@ -69,6 +98,18 @@ input, .button {
 
 .title {
   font-weight: bold;
+}
+
+.gold {
+  color: #e8ba47;
+}
+
+.silver {
+  color: #b2b2b2;
+}
+
+.bronze {
+  color: #b76e00;
 }
 
 #header {
