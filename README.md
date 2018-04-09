@@ -137,3 +137,6 @@ An Example Game:
 ## Annotations / References Used
 
 (__TODO__: list any tutorials/references/etc. that you've based your code off of_)
+Connecting database to MLab: https://docs.mlab.com/
+Configuring PassportJS: http://www.passportjs.org/docs/username-password/
+https://scotch.io/tutorials/easy-node-authentication-setup-and-local#handling-signupregistration

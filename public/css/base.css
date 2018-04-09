@@ -1,0 +1,81 @@
+body, html {
+  font-family: TrebuchetMS, sans-serif;
+  height: 100%;
+  margin: 0;
+}
+
+body, form, #body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+}
+
+#games {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  margin: 10px;
+}
+
+#games > div {
+  border: 1px solid black;
+  flex-basis: 50%;
+  justify-content: flex-start;
+  padding: 10px;
+  margin: 10px;
+}
+
+#games > div > div {
+  margin: 5px;
+}
+
+#games .users {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+form > #error {
+  background-color: #efa0a0;
+  padding: 10px;
+}
+
+form > #username, form > #password {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 20%;
+}
+
+form > #username > *, form > #password > * {
+  margin: 10px;
+}
+
+input, .button {
+  border: 1px solid black;
+  padding: 10px;
+  display: inline-block;
+}
+
+.button#join-game {
+  font-size: 14px;
+  padding: 5px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+#header {
+  margin: 10px auto;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}

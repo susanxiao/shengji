@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const URLSlugs = require('mongoose-url-slugs');
+const config = require('../config.json').mongo;
 
 const MODE = {
-  SHENGJI: 'Shengji',
-  ZHAOPENGYOU: 'Zhaopengyou'
+  Shengji: 'Shengji',
+  Zhaopengyou: 'Zhaopengyou'
 };
 
 const Player = new mongoose.Schema({
@@ -16,34 +17,29 @@ const Player = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Game'
   }],
-  usersPlayedWith: [
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Player'
-    },
-    times: Number
-  ]
+  usersPlayedWith: [{
+    user: {type: String, required: true},
+    times: {type:Number, required: true, default: 0}
+  }]
 });
 
-mongoose.model('Player', Player);
+mongoose.model('Player', Player, 'players');
 
 const Game = new mongoose.Schema({
   name: {type: String, required: true},
-  password: {type: String, required: true, unique: true},
-  numDecks: {type: Number, required: true},
-  mode: {type: String, required: true, enum: Object.getOwnPropertyNames(MODE)},
-  users: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player'
-  }],
-  host: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'}
+  password: {type: String, unique: true, sparse: true},
+  numDecks: {type: Number, required: true, default: 2},
+  mode: {type: String, required: true, enum: Object.getOwnPropertyNames(MODE), default:'SHENGJI'},
+  players: [String],
+  maxPlayers: {type: Number, required: true, default: 9},
+  host: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'},
+  started: {type: Boolean, default: false}
 });
 
 Game.plugin(URLSlugs('name'));
-mongoose.model('Game', Game);
+mongoose.model('Game', Game, 'games');
 
-// TODO: not this
-mongoose.connect('mongodb://localhost/final-proj');
+mongoose.connect(`mongodb://${config.user}:${config.password}@${config.url}`);
 
 module.exports = {
     mongoose: mongoose
