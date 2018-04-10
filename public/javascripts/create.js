@@ -93,9 +93,9 @@ function joinGame(evt) {
 
   fetch('/join', {
     method: 'POST',
-    headers: new Headers({
+    headers: {
       'Content-Type': 'application/json'
-    }),
+    },
     credentials: 'same-origin',
     body: JSON.stringify(gameObj)
   }).then(response => {
@@ -144,10 +144,8 @@ function createGame(evt) {
       'Content-Type': 'application/json'
     },
     credentials: 'same-origin',
-    redirect: 'error',
     body: JSON.stringify(gameObj)
   }).then(response => {
-    console.log(response.status);
     if (response.status === 303) { // error
       response.json().then(data => {
         const wrapper = document.createElement('div');
@@ -169,6 +167,6 @@ function createGame(evt) {
       }
       window.location.href = response.url;
     }
-  }).catch(err => console.log('hello', err));
+  }).catch(err => console.log(err));
 
 }
