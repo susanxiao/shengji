@@ -3,8 +3,8 @@ const URLSlugs = require('mongoose-url-slugs');
 const config = require('../config.json').mongo;
 
 const MODE = {
-  Shengji: 'Shengji',
-  Zhaopengyou: 'Zhaopengyou'
+  shengji: 'shengji',
+  zhaopengyou: 'zhaopengyou'
 };
 
 const Player = new mongoose.Schema({
@@ -27,9 +27,9 @@ mongoose.model('Player', Player, 'players');
 
 const Game = new mongoose.Schema({
   name: {type: String, required: true},
-  password: {type: String, unique: true, sparse: true},
+  password: {type: String},
   numDecks: {type: Number, required: true, default: 2},
-  mode: {type: String, required: true, enum: Object.getOwnPropertyNames(MODE), default:'SHENGJI'},
+  mode: {type: String, required: true, enum: Object.getOwnPropertyNames(MODE), default:'shengji'},
   players: [String],
   maxPlayers: {type: Number, required: true, default: 9},
   host: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'},

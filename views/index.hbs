@@ -1,26 +1,37 @@
 <h1>Shengji</h1>
-<div id='create-game' class='button'>
-  Start a new game
+<div class='button-wrapper'>
+  <div id='create-button' class='button'>
+    Start a new game
+  </div>
 </div>
 <div id='games'>
   {{#each games}}
-  <div id='{{name}}'>
+  <div id='{{slug}}' {{#if password}}class='password' {{/if}}value='{{name}}'>
     <div>
       <span class='title'>{{ name }}</span>
       {{#if password}}<i class='fas fa-lock fa-sm'></i>{{/if}}
     </div>
-    <div>
-      <span>{{mode}}&emsp;{{numDecks}} decks</span>
+    <div class='details'>
+      <div>
+        <div class='mode'>{{mode}}</div>
+        <div class='decks'>{{numDecks}} decks</div>
+      </div>
       <div class='users'>
+        <div class='count'>Users ({{players.length}}/{{maxPlayers}}):</div>
         {{#each players}}
         <div>{{this}}</div>
         {{/each}}
-        <div>({{players.length}}/{{maxPlayers}})</div>
+
       </div>
     </div>
       <div class='button-wrapper'>
-        <div id='join-game' class='button'>Join</div>
+        <div class='join-button button'>Join</div>
       </div>
   </div>
   {{/each}}
 </div>
+{{#if loggedIn}}
+  {{> overlay}}
+  {{> create_game}}
+  {{> join_game}}
+{{/if}}

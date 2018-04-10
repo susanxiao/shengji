@@ -2,6 +2,11 @@ body, html {
   font-family: TrebuchetMS, sans-serif;
   height: 100%;
   margin: 0;
+  text-transform: lowercase;
+}
+
+#body {
+  height: 100%;
 }
 
 body, form, #body {
@@ -12,10 +17,99 @@ body, form, #body {
   margin: 0;
 }
 
-h1 {
-  text-transform: lowercase;
+a, a:visited {
+  text-decoration: none;
+  color: #000;
 }
 
+a:hover {
+  color: #d8c69c;
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  color: #000;
+}
+
+.close-button:hover {
+  color: #d8c69c;
+}
+
+#overlay {
+  top: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 99;
+}
+
+#join-form {
+  width: 20%;
+}
+
+#join-form > form, #join-form .details, #join-form #password{
+  width: 100%;
+}
+
+#join-form > form > div {
+  width: 50%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+
+#join-form .details {
+  justify-content: center;
+}
+
+#join-form .details > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 10px;
+}
+
+#join-form .details > div  > div, #join-form #password > * {
+  margin: 0 10px;
+}
+
+#create-form, #join-form {
+  position: absolute;
+  background: #fff;
+  padding: 50px 100px;
+  z-index: 100;
+}
+
+#create-form > form, #join-form > form {
+  flex-direction: column;
+  justify-content: center;
+}
+
+#create-form > form > div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+}
+
+#create-form #mode label {
+  margin-left: 5px;
+}
+
+#create-form .button-wrapper, #join-form .button-wrapper {
+  display: flex;
+  justify-content: center;
+}
 #games {
   display: flex;
   flex-direction: row;
@@ -38,10 +132,18 @@ h1 {
   margin: 5px;
 }
 
-#games .users {
+#games .details > div {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+
+#games .details > div > div {
+  margin: 0 10px;
+}
+
+#games .users > .count {
+  align-self: flex-end;
 }
 
 #scoreboard {
@@ -68,12 +170,14 @@ h1 {
   margin: 10px;
 }
 
-form > #error {
+#error {
   background-color: #efa0a0;
   padding: 10px;
+  display: inline-block;
+  align-self: center;
 }
 
-form > #username, form > #password {
+.auth > #username, .auth > #password {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -81,7 +185,7 @@ form > #username, form > #password {
   width: 20%;
 }
 
-form > #username > *, form > #password > * {
+.auth > #username > *, .auth > #password > * {
   margin: 10px;
 }
 
@@ -91,9 +195,20 @@ input, .button {
   display: inline-block;
 }
 
-.button#join-game {
+.button#join-button {
   font-size: 14px;
   padding: 5px;
+}
+
+input[type='submit'], .button {
+  background-color: #fff;
+  color: #000;
+}
+
+input[type='submit']:hover, .button:hover {
+  border-color: #d8c69c;
+  background-color: #d8c69c;
+  color: #fff;
 }
 
 .title {
@@ -110,6 +225,10 @@ input, .button {
 
 .bronze {
   color: #b76e00;
+}
+
+.hidden {
+  display: none;
 }
 
 #header {

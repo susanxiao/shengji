@@ -4,6 +4,8 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 
+const bcrypt = require('bcryptjs');
+
 const mongoose = require('mongoose');
 const Game = mongoose.model('Game');
 const Player = mongoose.model('Player');
@@ -14,9 +16,13 @@ const passport = require('passport');
 require('./passport-config.js')(passport);
 const flash = require('connect-flash');
 
+const hbs = require('hbs');
 app.set('view engine', 'hbs');
+// reference: https://stackoverflow.com/questions/8059914/express-js-hbs-module-register-partials-from-hbs-file/12700409#12700409
+hbs.registerPartials(path.join(__dirname, '..', 'views', 'partials'));
 
 app.use(
+  express.json(),
   express.static(path.join(__dirname, '..', 'public')),
   express.urlencoded({ extended: false }),
   session({
@@ -40,7 +46,11 @@ app.use(
 
 app.get('/', (req, res) => {
   Game.find({started: false}, (err, games) => {
-    res.render('index.hbs', { games: games });
+    if (res.locals.loggedIn) {
+      res.render('index.hbs', { games: games, scripts: ['javascripts/create.js'] });
+    } else {
+      res.render('index.hbs', { games: games, scripts: ['javascripts/login.js']});
+    }
   });
 });
 
@@ -67,9 +77,9 @@ app.get('/scoreboard', (req, res) => {
       console.log(err);
       res.status(500).send('Internal Server Error');
     } else {
-      Player.find().sort({'gameWins': -1}).limit(3).exec((err1, games) => {
-        if (err1) {
-          console.log(err1);
+      Player.find().sort({'gameWins': -1}).limit(3).exec((err, games) => {
+        if (err) {
+          console.log(err);
           res.status(500).send('Internal Server Error');
         } else {
           res.render('scoreboard.hbs', {
@@ -92,6 +102,36 @@ app.get('/scoreboard', (req, res) => {
   });
 });
 
+// not finished!!
+app.get('/game/:game', (req, res) => {
+  const game = req.params.game;
+  Game.findOne({slug: game}, (err, game) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    } else if (game) {
+      res.render('game.hbs', {name: game.name});
+    } else {
+      res.render('game.hbs', {name: 'not found'});
+    }
+  });
+});
+
+// not finished!
+app.get('/user/:username', (req, res) => {
+  const username = req.params.username;
+  Player.findOne({username: username}, (err, player) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Internal Server Error');
+    } else if (player) {
+      res.render('user.hbs', {username: player.username});
+    } else {
+      res.render('user.hbs', {username: 'not found'});
+    }
+  });
+});
+
 app.post('/login', passport.authenticate('local-login', {
   successRedirect: '/',
   failureRedirect: '/login',
@@ -103,6 +143,101 @@ app.post('/register', passport.authenticate('local-signup', {
   failureRedirect : '/register',
   failureFlash : true
 }));
+
+app.post('/join', (req, res) => {
+  Game.findOne({slug: req.body.slug}, (err, game) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send();
+    } else if (game) {
+      bcrypt.compare((req.body.password || ''), (game.password || ''), (err, passwordMatch) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send();
+        } else if (game.password && !passwordMatch) {
+          console.log('Wrong password.');
+          res.status(204).send({message: 'Wrong password.'});
+        } else {
+          if (game.players.includes(res.locals.username)) {
+            console.log('Duplicate user in game.');
+            res.status(204).send({message: 'You are already in this game.'});
+          } else {
+            req.user.games.push(mongoose.Schema.Types.ObjectId(game._id));
+            game.players.push(res.locals.username);
+            game.save((err, game) => {
+              if (err) {
+                console.log(err);
+                res.status(500).send();
+              } else {
+                req.user.save((err, player) => {
+                  if (err) {
+                    console.log(err);
+                    res.status(500).send();
+                  } else {
+                    console.log('Joined game');
+                    res.redirect('/'); // TODO: redirect to game/:slug (req.body.slug)
+                  }
+                })
+              }
+            });
+          }
+        }
+      });
+    } else {
+      console.log(err); // game not found
+      res.status(500).send();
+    }
+  });
+});
+
+app.post('/create', (req, res) => {
+  Game.findOne({name: req.body.name}, (err, game) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send();
+    } else if (game) {
+      console.log('Duplicate game name.');
+      res.status(204).send({message: 'Name already exists.'});
+    } else {
+      bcrypt.hash((req.body.password || ''), 10, (err, hash) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send();
+        } else {
+          const details = req.body;
+          if (details.password) {
+            details.password = hash;
+          }
+          new Game(details).save((err, game) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send();
+            } else {
+              req.user.games.push(mongoose.Schema.Types.ObjectId(game._id));
+              game.players.push(res.locals.username);
+              game.save((err, game) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).send();
+                } else {
+                  req.user.save((err, player) => {
+                    if (err) {
+                      console.log(err);
+                      res.status(500).send();
+                    } else {
+                      console.log('Created game.');
+                      res.redirect('/'); // TODO: redirect to game/:slug
+                    }
+                  })
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
 /*
 * /

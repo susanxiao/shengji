@@ -24,7 +24,9 @@ module.exports = (passport) => {
           return done(null, false, { message: 'Incorrect username.' });
         } else {
           bcrypt.compare(password, player.password, (err, passwordMatch) => {
-            if (passwordMatch) {
+            if (err) {
+              done(err);
+            } else if (passwordMatch) {
               return done(null, player);
             } else {
               return done(null, false, { message: 'Incorrect password.' });
