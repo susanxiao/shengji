@@ -3,7 +3,7 @@
   <form>
     <h3>Create a New Game</h3>
     <div id='name'>
-      <label>Name</label><input type='text' name='name' />
+      <label>Name</label><input type='text' name='name' required />
     </div>
     <div id='password'>
       <label>Password</label><input type='text' name='password' />
@@ -17,11 +17,11 @@
       </div>
     </div>
     <div id='details'>
-      <label># decks</label><input type='number' name='numDecks' value=2 min='2' max='4'>
-      <label>Max # Players</label><input type='number' name='maxPlayers' value=9 min='4' max=9>
+      <label># decks</label><input type='number' name='numDecks' value='2' min='2' max='4'>
+      <label>Max # Players</label><input type='number' name='maxPlayers' value='9' min='4' max='9'>
     </div>
     <div class='button-wrapper'>
-      <div class='button' id='create-game'>Create</div>
+      <input type='submit' class='button' id='create-game' value='Create' />
     </div>
   </form>
 </div>

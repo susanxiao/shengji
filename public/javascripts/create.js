@@ -59,22 +59,12 @@ function getGameDetails(game) {
 }
 
 function joinGame(evt) {
+  evt.preventDefault();
   const form = this.parentNode.parentNode;
   const details = form.querySelector('.details');
 
   const gameObj = {};
-  gameObj.slug = form.querySelector('.slug').getAttribute('value');
-  gameObj.mode = details.querySelector('.mode').innerText;
-  gameObj.decks = details.querySelector('.decks').innerText.slice(0, 1);
-
-  gameObj.users = [];
-  Array.prototype.forEach.call(details.querySelector('.users').children,
-  child => {
-    if (!child.classList.contains('count')) {
-      gameObj.users.push(child.innerText);
-    }
-  });
-
+  
   const password = form.querySelector('#password > input');
   if (password) {
     if (password.value === '') {
@@ -88,8 +78,24 @@ function joinGame(evt) {
       return;
     } else {
       gameObj.password = password.value;
+      const error = form.querySelector('#error');
+      if (error) {
+        error.parentNode.remove();
+      }
     }
   }
+
+  gameObj.slug = form.querySelector('.slug').getAttribute('value');
+  gameObj.mode = details.querySelector('.mode').innerText;
+  gameObj.decks = details.querySelector('.decks').innerText.slice(0, 1);
+
+  gameObj.users = [];
+  Array.prototype.forEach.call(details.querySelector('.users').children,
+  child => {
+    if (!child.classList.contains('count')) {
+      gameObj.users.push(child.innerText);
+    }
+  });
 
   fetch('/join', {
     method: 'POST',
@@ -129,44 +135,66 @@ function joinGame(evt) {
 }
 
 function createGame(evt) {
+  evt.preventDefault();
   //reference: https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
   const form = document.querySelector('#create-form > form')
-  const game = new FormData(form);
-  const gameObj = {};
-  for (let [key, val] of game.entries()) {
-    gameObj[key] = val;
-  }
+  if (form.querySelector(':invalid')) {
+    const message =  document.createElement('div');
+    message.innerText = 'Invalid input.';
+    message.setAttribute('id', 'error');
 
-  //reference: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  fetch('/create', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'same-origin',
-    body: JSON.stringify(gameObj)
-  }).then(response => {
-    if (response.status === 303) { // error
-      response.json().then(data => {
-        const wrapper = document.createElement('div');
-        const message =  document.createElement('div');
-        message.innerText = data.message;
-        message.setAttribute('id', 'error');
-        wrapper.append(message);
-        wrapper.style.justifyContent = 'center';
-        document.querySelector('#create-form h3').after(wrapper);
-      });
+    const error = form.querySelector('#error');
+    if (error) {
+      error.replaceWith(message);
     } else {
-      form.reset();
-      document.querySelector('#create-form').classList.add('hidden');
-      document.querySelector('#overlay').classList.add('hidden');
-      this.removeEventListener('click', createGame);
-      const error = document.querySelector('#error');
-      if (error) {
-        error.parentNode.remove();
-      }
-      window.location.href = response.url;
+      const wrapper = document.createElement('div');
+      wrapper.append(message);
+      wrapper.style.justifyContent = 'center';
+      document.querySelector('#create-form h3').after(wrapper);
     }
-  }).catch(err => console.log(err));
+  } else {
+    const game = new FormData(form);
+    const gameObj = {};
+    for (let [key, val] of game.entries()) {
+      gameObj[key] = val;
+    }
 
+    //reference: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    fetch('/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(gameObj)
+    }).then(response => {
+      if (response.status === 303) { // error
+        response.json().then(data => {
+          const message =  document.createElement('div');
+          message.innerText = data.message;
+          message.setAttribute('id', 'error');
+
+          const error = form.querySelector('#error');
+          if (error) {
+            error.replaceWith(message);
+          } else {
+            const wrapper = document.createElement('div');
+            wrapper.append(message);
+            wrapper.style.justifyContent = 'center';
+            document.querySelector('#create-form h3').after(wrapper);
+          }
+        });
+      } else {
+        form.reset();
+        document.querySelector('#create-form').classList.add('hidden');
+        document.querySelector('#overlay').classList.add('hidden');
+        this.removeEventListener('click', createGame);
+        const error = form.querySelector('#error');
+        if (error) {
+          error.parentNode.remove();
+        }
+        window.location.href = response.url;
+      }
+    }).catch(err => console.log(err));
+  }
 }
