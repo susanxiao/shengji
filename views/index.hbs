@@ -20,9 +20,8 @@
         <div class='users'>
           <div class='count'>Users ({{players.length}}/{{maxPlayers}}):</div>
           {{#each players}}
-          <div>{{this}}</div>
+          <a href='user/{{this}}'>{{this}}</a>
           {{/each}}
-
         </div>
       </div>
         <div class='button-wrapper'>
