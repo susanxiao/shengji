@@ -26,6 +26,10 @@ a:hover {
   color: #d8c69c;
 }
 
+.user, .game {
+  text-transform: none;
+}
+
 .close-button {
   position: absolute;
   top: 0;
@@ -137,7 +141,7 @@ a:hover {
   margin: 10px;
 }
 
-#games > div > div > div {
+#games > div > div > div, #games .users > * {
   margin: 5px;
 }
 
@@ -153,6 +157,10 @@ a:hover {
 
 #games .users > .count {
   align-self: flex-end;
+}
+
+#games .users {
+  align-items: center;
 }
 
 #scoreboard {

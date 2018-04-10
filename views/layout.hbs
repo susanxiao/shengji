@@ -15,7 +15,7 @@
     </div>
     <div>
       {{#if loggedIn}}
-        <a href='/users/{{ username }}'>{{ username }}</a> |
+        <a class='user' href='/users/{{ username }}'>{{ username }}</a> |
         <a href='/logout'>Logout</a>
       {{else}}
         <a href='/login'>Login</a> |

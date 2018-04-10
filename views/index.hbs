@@ -7,7 +7,14 @@
 <div id='games'>
   <div>
     {{#each games}}
-    <div id='{{slug}}' {{#if password}}class='password' {{/if}}value='{{name}}'>
+    <div
+      id='{{slug}}'
+      class='game
+      {{#if password}}
+      password
+      {{/if}}'
+      value='{{name}}'
+    >
       <div>
         <span class='title'>{{ name }}</span>
         {{#if password}}<i class='fas fa-lock fa-sm'></i>{{/if}}
@@ -20,7 +27,7 @@
         <div class='users'>
           <div class='count'>Users ({{players.length}}/{{maxPlayers}}):</div>
           {{#each players}}
-          <a href='user/{{this}}'>{{this}}</a>
+          <div><a class='user' href='user/{{this}}'>{{this}}</a></div>
           {{/each}}
         </div>
       </div>

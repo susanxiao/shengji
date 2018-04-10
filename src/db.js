@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const URLSlugs = require('mongoose-url-slugs');
-const config = (process.env) ? null : require('../config.json').mongo;
+const config = (process.env.MURL) ? null : require('../config.json').mongo;
 
 const MURL = process.env.MURL || config.url;
 const MUSER = process.env.MUSER || config.user;
