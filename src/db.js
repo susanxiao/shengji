@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const URLSlugs = require('mongoose-url-slugs');
-const config = require('../config.json').mongo;
+
+const MURL = process.env.MURL || config.url;
+const MUSER = process.env.MUSER || config.user;
+const MPASS = process.env.MPASS || config.password;
 
 const MODE = {
   shengji: 'shengji',
@@ -39,7 +42,7 @@ const Game = new mongoose.Schema({
 Game.plugin(URLSlugs('name'));
 mongoose.model('Game', Game, 'games');
 
-mongoose.connect(`mongodb://${config.user}:${config.password}@${config.url}`);
+mongoose.connect(`mongodb://${MUSER}:${MPASS}@${MURL}`);
 
 module.exports = {
     mongoose: mongoose

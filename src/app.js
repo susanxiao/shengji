@@ -1,3 +1,5 @@
+const PORT = process.env.PORT || 3000;
+
 require('./db.js');
 
 const express = require('express');
@@ -258,4 +260,4 @@ app.post('/create', (req, res) => {
   * rejoin (for own page) -> redirect to '/game/[game-slug]'
 */
 
-app.listen(3000);
+app.listen(PORT);
