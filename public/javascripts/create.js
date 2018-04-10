@@ -18,9 +18,9 @@ document.addEventListener('DOMContentLoaded', evt => {
       const form = document.querySelector('#join-form > form');
       const game = button.parentNode.parentNode;
       const details = getGameDetails(game);
-      const hidden = document.createElement('input');
-      hidden.setAttribute('type', 'hidden');
-      hidden.setAttribute('name', 'slug');
+      const hidden = document.createElement('div');
+      hidden.classList.add('slug');
+      hidden.classList.add('hidden');
       hidden.setAttribute('value', game.getAttribute('id'));
       form.append(hidden);
       form.insertBefore(details, form.firstChild);
@@ -46,6 +46,11 @@ function getGameDetails(game) {
     const input = document.createElement('input');
     input.setAttribute('type', 'text');
     input.setAttribute('name', 'password');
+    input.addEventListener('keypress', evt => {
+      if (evt.keyCode === 13) {
+        evt.preventDefault();
+      }
+    });
     password.append(label);
     password.append(input);
     details.insertBefore(password, clonedDetails);
@@ -58,7 +63,7 @@ function joinGame(evt) {
   const details = form.querySelector('.details');
 
   const gameObj = {};
-  gameObj.slug = form.querySelector('input[type=hidden]').getAttribute('value');
+  gameObj.slug = form.querySelector('.slug').getAttribute('value');
   gameObj.mode = details.querySelector('.mode').innerText;
   gameObj.decks = details.querySelector('.decks').innerText.slice(0, 1);
 
@@ -86,8 +91,6 @@ function joinGame(evt) {
     }
   }
 
-  console.log(gameObj);
-
   fetch('/join', {
     method: 'POST',
     headers: new Headers({
@@ -96,19 +99,11 @@ function joinGame(evt) {
     credentials: 'same-origin',
     body: JSON.stringify(gameObj)
   }).then(response => {
-    console.log(response);
-    if (response.url) {
-      form.querySelector('input[type=hidden]').remove();
-      details.remove();
-      document.querySelector('#overlay').classList.add('hidden');
-      this.removeEventListener('click', joinGame);
+    if (response.status === 303) { // error
       const error = document.querySelector('#error');
-      if (error) {
-        error.parentNode.remove(); // wrapper
+      if (error) { // remove old error
+        error.parentNode.remove();
       }
-
-      window.location.href = response.url;
-    } else { // error
       response.json().then(data => {
         const wrapper = document.createElement('div');
         const message =  document.createElement('div');
@@ -118,6 +113,17 @@ function joinGame(evt) {
         wrapper.style.justifyContent = 'center';
         document.querySelector('#join-form h3').after(wrapper);
       });
+    } else {
+      form.querySelector('.slug').remove();
+      details.remove();
+      document.querySelector('#overlay').classList.add('hidden');
+      this.removeEventListener('click', joinGame);
+      const error = document.querySelector('#error');
+      if (error) {
+        error.parentNode.remove(); // wrapper
+      }
+
+      window.location.href = response.url;
     }
   }).catch(err => console.log(err));
 }
@@ -138,21 +144,11 @@ function createGame(evt) {
       'Content-Type': 'application/json'
     },
     credentials: 'same-origin',
-    follow: 'manual',
+    redirect: 'error',
     body: JSON.stringify(gameObj)
   }).then(response => {
-    console.log(response);
-    if (response.url) {
-      form.reset();
-      document.querySelector('#create-form').classList.add('hidden');
-      document.querySelector('#overlay').classList.add('hidden');
-      this.removeEventListener('click', createGame);
-      const error = document.querySelector('#error');
-      if (error) {
-        error.parentNode.remove();
-      }
-      window.location.href = response.url;
-    } else { // error
+    console.log(response.status);
+    if (response.status === 303) { // error
       response.json().then(data => {
         const wrapper = document.createElement('div');
         const message =  document.createElement('div');
@@ -162,7 +158,17 @@ function createGame(evt) {
         wrapper.style.justifyContent = 'center';
         document.querySelector('#create-form h3').after(wrapper);
       });
+    } else {
+      form.reset();
+      document.querySelector('#create-form').classList.add('hidden');
+      document.querySelector('#overlay').classList.add('hidden');
+      this.removeEventListener('click', createGame);
+      const error = document.querySelector('#error');
+      if (error) {
+        error.parentNode.remove();
+      }
+      window.location.href = response.url;
     }
-  }).catch(err => console.log(err));
+  }).catch(err => console.log('hello', err));
 
 }

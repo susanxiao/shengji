@@ -158,11 +158,11 @@ app.post('/join', (req, res) => {
           res.status(500).send();
         } else if (game.password && !passwordMatch) {
           console.log('Wrong password.');
-          res.status(204).send({message: 'Wrong password.'});
+          res.status(303).send({message: 'Wrong password.'});
         } else {
           if (game.players.includes(res.locals.username)) {
             console.log('Duplicate user in game.');
-            res.status(204).send({message: 'You are already in this game.'});
+            res.status(303).send({message: 'You are already in this game.'});
           } else {
             req.user.games.push(mongoose.Schema.Types.ObjectId(game._id));
             game.players.push(res.locals.username);
@@ -199,7 +199,7 @@ app.post('/create', (req, res) => {
       res.status(500).send();
     } else if (game) {
       console.log('Duplicate game name.');
-      res.status(204).send({message: 'Name already exists.'});
+      res.status(303).send({message: 'Name already exists.'});
     } else {
       bcrypt.hash((req.body.password || ''), 10, (err, hash) => {
         if (err) {
