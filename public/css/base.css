@@ -38,6 +38,10 @@ a:hover {
   color: #d8c69c;
 }
 
+#login-link, #register-link {
+  margin: 10px;
+}
+
 #overlay {
   top: 0;
   position: absolute;
@@ -110,6 +114,7 @@ a:hover {
   display: flex;
   justify-content: center;
 }
+
 #games {
   display: flex;
   flex-direction: row;
