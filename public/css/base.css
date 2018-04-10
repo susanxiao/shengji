@@ -117,10 +117,14 @@ a:hover {
   justify-content: center;
   width: 100%;
   margin: 10px;
-  overflow-y:auto;
 }
 
 #games > div {
+  width: 50%;
+  overflow-y: auto;
+}
+
+#games > div > div {
   border-bottom: 1px solid #999;
   flex-basis: 50%;
   justify-content: flex-start;
@@ -128,7 +132,7 @@ a:hover {
   margin: 10px;
 }
 
-#games > div > div {
+#games > div > div > div {
   margin: 5px;
 }
 
