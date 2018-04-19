@@ -135,8 +135,16 @@ An Example Game:
 ## [Link to Initial Main Project File](src/app.js)
 
 ## Annotations / References Used
+Connecting database to MLab:
+https://docs.mlab.com/
 
-(__TODO__: list any tutorials/references/etc. that you've based your code off of_)
-Connecting database to MLab: https://docs.mlab.com/
-Configuring PassportJS: http://www.passportjs.org/docs/username-password/
+Configuring PassportJS:
+http://www.passportjs.org/docs/username-password/
 https://scotch.io/tutorials/easy-node-authentication-setup-and-local#handling-signupregistration
+
+Webpack:
+https://webpack.js.org/guides/getting-started/#using-a-configuration
+
+React:
+https://medium.com/@pshrmn/a-simple-react-router-v4-tutorial-7f23ff27adf
+https://ourcodeworld.com/articles/read/409/how-to-update-parent-state-from-child-component-in-react
