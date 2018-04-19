@@ -90,7 +90,7 @@ class Login extends React.Component {
 
   render() {
     return (
-      <div id="join-form">
+      <div id="login-form">
         <i className="fas fa-times close-button" onClick={() => this.props.popupHandler({type: 'close'})}></i>
         <form className='auth'>
           <h1>Login</h1>
@@ -163,7 +163,7 @@ class Register extends React.Component {
 
   render() {
     return (
-      <div id="join-form">
+      <div id="register-form">
         <i className="fas fa-times close-button" onClick={() => this.props.popupHandler({type: 'close'})}></i>
         <form className='auth'>
           <h1>Register</h1>

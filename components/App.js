@@ -15,7 +15,15 @@ export default class App extends React.Component {
       socket: socket
     };
 
+    socket.on('check-login', data => {
+      this.setState({username: data});
+    });
+
     this._handleLogin = this._handleLogin.bind(this);
+  }
+
+  componentDidMount() {
+    this.state.socket.emit('check-login');
   }
 
   _handleLogin(username) {

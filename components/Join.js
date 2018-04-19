@@ -1,4 +1,5 @@
 const React = require('react');
+import { Link } from 'react-router-dom';
 
 export class JoinButton extends React.Component {
   constructor(props) {
@@ -56,7 +57,7 @@ export class JoinPopup extends React.Component {
                 <div className='count'>Users ({ this.state.players.length }/{ this.state.maxPlayers }):</div>
                 {
                   this.state.players.map(player =>
-                    <div><a className='user' href='user/{{this}}'>{ player }</a></div>
+                    <div><Link to={ '/user/'+player } className='user'>{ player }</Link></div>
                   )
                 }
               </div>

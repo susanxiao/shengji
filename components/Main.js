@@ -8,6 +8,18 @@ import { AppContext } from './App.js';
 import { Switch, Route } from 'react-router-dom';
 
 export default class Main extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = props;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.setState(this.props);
+    }
+  }
+
   // https://stackoverflow.com/questions/35835670/react-router-and-this-props-children-how-to-pass-state-to-this-props-children
   render() {
     return (
@@ -15,12 +27,24 @@ export default class Main extends React.Component {
         <Switch>
           <Route exact path='/'
             render={ _ => (
-                <Games {...this.props} />
+              <Games {...this.state} />
+            ) }
+          />
+          <Route exact path='/scoreboard'
+            render={ _ => (
+              <Scoreboard socket={this.state.socket} />
             )}
           />
-          <Route exact path='/scoreboard' component={Scoreboard} />
-          <Route path='/user/:username' component={User} />
-          <Route path='/game/:game' component={Game} />
+          <Route path='/user/:username'
+            render={ ({match}) => (
+              <User {...this.state} match={ match } />
+            ) }
+          />
+          <Route path='/game/:game'
+            render={ ({match}) => (
+              <Game {...this.state} match={ match } />
+            ) }
+          />
         </Switch>
       </div>
     );

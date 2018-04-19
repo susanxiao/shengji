@@ -97,21 +97,109 @@ app.post('/logout', (req, res) => {
   } else {
     res.status(303).send();
   }
-
 });
 
-    // .on("connection", function(socket){
-    //     var userId = socket.request.session.passport.user;
-    //     console.log("Your User ID is", userId);
-    // });
+app.post('/user/:username', (req, res) => {
+  if (req.user.username === req.params.username) {
+    req.user.description = req.body.description;
+    req.user.save((err, player) => {
+      if (err) {
+        res.status(500).send();
+      } else {
+        res.status(200).send();
+      }
+    });
+  } else {
+    res.status(303).send();
+  }
+});
 
 io.on('connection', (socket) => {
+  let user;
+  // TODO: this is to avoid losing the user on refresh...should be a better way
+  socket.on('check-login', _ => {
+    if (user) {
+      socket.emit('check-login', user.username);
+    } else if (socket.request.session.passport) {
+      Player.findById(mongoose.Types.ObjectId(socket.request.session.passport.user), (err, player) => {
+        if (err) {
+          console.log(err);
+        } else if (!player) {
+          user = null;
+          socket.emit('check-login', '');
+        } else {
+          user = player;
+          socket.emit('check-login', user.username);
+        }
+      });
+    } else {
+      user = null;
+      socket.emit('check-login', '');
+    }
+  });
+
   socket.on('get-game-all', _ => {
     Game.find({started: false}, (err, games) => {
       if (err) {
         console.log(err);
       } else {
         socket.emit('get-game-all', JSON.stringify(games));
+      }
+    });
+  });
+
+  socket.on('get-wins', _ => {
+    Player.find().sort({'roundWins': -1}).limit(3).exec((err, rounds) => {
+      if (err) {
+        console.log(err);
+      } else {
+        socket.emit('get-wins-round', JSON.stringify(rounds.map(round => {
+          return {
+            username: round.username,
+            wins: round.roundWins
+          };
+        })));
+      }
+    });
+
+    Player.find().sort({'gameWins': -1}).limit(3).exec((err, games) => {
+      if (err) {
+        console.log(err);
+      } else {
+        socket.emit('get-wins-game', JSON.stringify(games.map(game => {
+          return {
+            username: game.username,
+            wins: game.gameWins
+          };
+        })));
+      }
+    });
+  });
+
+  socket.on('get-user', data => {
+    const { visitor, visitee } = JSON.parse(data);
+    Player.findOne({username: visitee}, (err, player) => {
+      if (err) {
+        console.log(err);
+      } else if (!player) {
+        socket.emit('get-user', JSON.stringify({error: 'User does not exist.'}));
+      } else {
+        let playedWith = 0;
+        player.usersPlayedWith.some(user => {
+          if (user.user === visitor) {
+            playedWith = user.times;
+            return true;
+          }
+          return false;
+        });
+
+        socket.emit('get-user', JSON.stringify({
+          username: player.username,
+          roundWins: player.roundWins,
+          gameWins: player.gameWins,
+          playedWith: playedWith,
+          description: player.description
+        }));
       }
     });
   });
