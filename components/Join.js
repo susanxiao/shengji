@@ -76,11 +76,11 @@ export class JoinPopup extends React.Component {
           this.setState({redirect: true});
           this.props.popupHandler({type: 'close'});
         } else {
-          return response.json().then(data => {
-            if (data.message) {
-              this.setState({error: data.message});
-            }
-          });
+          return response.json();
+        }
+      }).then(data => {
+        if (data && data.message) {
+          this.setState({error: data.message});
         }
       });
     }
@@ -91,7 +91,7 @@ export class JoinPopup extends React.Component {
       return (
         <Redirect
           to={{
-            pathname: '/game/'+this.state.slug
+            pathname: '/game/'+this.props.slug
           }}
         />
       );

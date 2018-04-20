@@ -13,6 +13,8 @@ const path = require('path');
 
 const bcrypt = require('bcryptjs');
 
+const gameServe = require('./game.js');
+
 require('./db.js');
 const mongoose = require('mongoose');
 const Game = mongoose.model('Game');
@@ -140,6 +142,7 @@ app.post('/game/create', (req, res) => {
               return req.user.save().then(_ => {
                 res.status(200).send(game);
                 io.emit('receive-game', JSON.stringify(game));
+                new gameServe(io.of('/'+game._id), game);
               });
             })
             .catch(err => {
@@ -159,9 +162,9 @@ app.post('/game/join', (req, res) => {
       .then(game => {
         return bcrypt.compare((req.body.password || ''), (game.password || ''))
           .then(match => {
-            if (match) {
+            if (!game.password || match) {
               game.players.push(req.user.username);
-              return game.save().then(game => {
+              return game.save().then(game => { // again, save the game first
                 req.user.game = game._id;
                 return req.user.save().then(_ => {
                   res.status(200).send();
@@ -178,6 +181,21 @@ app.post('/game/join', (req, res) => {
         res.status(500).send();
       });
   }
+});
+
+app.post('/game/leave', (req, res) => {
+  req.user.game = null;
+  req.user.save()
+    .then(_ => Game.findOne({slug: req.body.slug}).exec())
+    .then(game => {
+      game.players.splice(game.players.indexOf(req.user.username), 1);
+      return game.save();
+    })
+    .then(_ => res.status(200).send())
+    .catch(err => {
+      console.log(err);
+      res.status(500).send();
+    });
 });
 
 io.on('connection', (socket) => {
@@ -213,6 +231,18 @@ io.on('connection', (socket) => {
       }
     });
   });
+
+  socket.on('get-game-details', slug => {
+    Game.findOne({slug: slug}, (err, game) => {
+      if (err) {
+        console.log(err);
+      } else if (!game) {
+        socket.emit('receive-game-details', '');
+      } else {
+        socket.emit('receive-game-details', JSON.stringify(game));
+      }
+    });
+  })
 
   socket.on('get-wins', _ => {
     Player.find().sort({'roundWins': -1}).limit(3).exec((err, rounds) => {
