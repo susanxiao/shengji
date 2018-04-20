@@ -11,6 +11,12 @@ class Game extends React.Component {
     this.state = props;
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.setState(this.props);
+    }
+  }
+
   render() {
     return (
       <div
@@ -37,7 +43,12 @@ class Game extends React.Component {
         </div>
         <JoinButton
           name={ this.state.name }
-          password={ this.state.password }
+          password={ !!this.state.password }
+          slug={ this.state.slug }
+          mode={ this.state.mode }
+          numDecks={ this.state.numDecks }
+          players={ this.state.players }
+          maxPlayers={ this.state.maxPlayers }
           popupHandler={ this.props.popupHandler }
         />
       </div>
@@ -64,6 +75,19 @@ export default class Games extends React.Component {
       const game = JSON.parse(data);
       const games = this.state.games;
       games.push(game);
+      this.setState({games: games});
+    });
+
+    this.props.socket.on('receive-update', (data) => {
+      const game = JSON.parse(data);
+      const games = this.state.games;
+      this.state.games.some((g, index) => {
+        if (g.slug === game.slug) {
+          games.splice(index, 1, game);
+          return true;
+        }
+        return false;
+      });
       this.setState({games: games});
     });
 
@@ -95,7 +119,16 @@ export default class Games extends React.Component {
         return (
           <Fragment>
             <div id='overlay'></div>
-            <JoinPopup {...this.props} popupHandler={ this._handlePopup } />
+            <JoinPopup
+              slug={ this.state.popup.slug }
+              password={ this.state.popup.password }
+              name={ this.state.popup.name }
+              mode={ this.state.popup.mode }
+              numDecks={ this.state.popup.numDecks }
+              players={ this.state.popup.players }
+              maxPlayers={ this.state.popup.maxPlayers }
+              popupHandler={ this._handlePopup }
+            />
           </Fragment>
         );
       }

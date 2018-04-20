@@ -125,7 +125,7 @@ app.post('/game/create', (req, res) => {
         if (game) {
           res.status(303).send({message: 'Name already exists.'});
         } else {
-          return createGame = bcrypt.hash((req.body.password || ''), 10)
+          return bcrypt.hash((req.body.password || ''), 10)
             .then(hash => {
               const details = req.body;
               details.players = [];
@@ -147,6 +147,35 @@ app.post('/game/create', (req, res) => {
               res.status(500).send();
             });
         }
+      });
+  }
+});
+
+app.post('/game/join', (req, res) => {
+  if (req.user.game) {
+    res.status(303).send({message: 'You are already in a game.'});
+  } else {
+    Game.findOne({slug: req.body.slug}).exec()
+      .then(game => {
+        return bcrypt.compare((req.body.password || ''), (game.password || ''))
+          .then(match => {
+            if (match) {
+              game.players.push(req.user.username);
+              return game.save().then(game => {
+                req.user.game = game._id;
+                return req.user.save().then(_ => {
+                  res.status(200).send();
+                  io.emit('receive-update', JSON.stringify(game));
+                });
+              })
+            } else {
+              res.status(303).send({message: 'Wrong password.'});
+            }
+          });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send();
       });
   }
 });
