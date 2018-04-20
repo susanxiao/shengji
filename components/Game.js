@@ -9,13 +9,14 @@ export default class Game extends React.Component {
 
     this.state = {
       name: '',
-      inGame: false,
+      started: false,
       gameSocket: null,
       slug: this.props.match.params.game,
       username: this.props.username,
       auth: false,
       redirect: false,
-      loading: true
+      loading: true,
+      game: null,
     };
 
     this.props.socket.on('receive-game-details', data => {
@@ -27,6 +28,7 @@ export default class Game extends React.Component {
             const socket = io('/'+details._id);
             socket.emit('test');
             this.setState({gameSocket: socket});
+            this.setState({game: details});
             this.setState({auth: true});
           }
         } else {
@@ -57,8 +59,8 @@ export default class Game extends React.Component {
     this.props.socket.emit('get-game-details', this.state.slug);
   }
 
-  _leaveGame() {
-    const data = 'slug='+this.state.slug;
+  _leaveGame(deleteGame) {
+    const data = 'slug='+this.state.slug+(deleteGame ? '&delete='+deleteGame : '');
     fetch('/game/leave', {
       method: 'POST',
       headers: {
@@ -71,6 +73,29 @@ export default class Game extends React.Component {
         this.setState({redirect: true});
       }
     });
+  }
+
+  _renderLeave() {
+    if (this.state.game.password && this.state.game.players.length === 1) {
+      return (
+        <div className='button-wrapper'>
+          <div className='button' onClick={ () => this._leaveGame(true) }>{ 'Leave and delete game' }</div>
+        </div>
+      );
+    } else if (this.state.game.players.length === 1) {
+      return (
+        <div className='button-wrapper'>
+          <div className='button' onClick={ () => this._leaveGame(false) }>{ 'Leave game' }</div>
+          <div className='button' onClick={ () => this._leaveGame(true) }>{ 'Leave and delete game' }</div>
+        </div>
+      );
+    } else {
+      return (
+        <div className='button-wrapper'>
+          <div className='button' onClick={ () => this._leaveGame(false) }>{ 'Leave game' }</div>
+        </div>
+      );
+    }
   }
 
   render() {
@@ -100,9 +125,7 @@ export default class Game extends React.Component {
       return (
         <div id='game-lobby'>
           <h1>{ this.state.name }</h1>
-          <div className='button-wrapper'>
-            <div className='button' onClick={ this._leaveGame } >Leave game</div>
-          </div>
+          { this._renderLeave() }
         </div>
       );
     }

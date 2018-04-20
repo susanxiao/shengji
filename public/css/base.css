@@ -254,6 +254,10 @@ input, .button {
   display: inline-block;
 }
 
+.button {
+  margin: 10px;
+}
+
 .disable {
   border: 1px solid #999;
   padding: 10px;

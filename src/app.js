@@ -196,14 +196,23 @@ app.post('/game/join', (req, res) => {
 app.post('/game/leave', (req, res) => {
   req.user.game = null;
   req.user.save()
-    .then(_ => Game.findOne({slug: req.body.slug}).exec())
+    .then(_ => {
+      if (req.body.delete) {
+        Game.findOneAndRemove({slug: req.body.slug}).exec();
+        res.status(200).send();
+      } else {
+        return Game.findOne({slug: req.body.slug}).exec();
+      }
+    })
     .then(game => {
-      game.players.splice(game.players.indexOf(req.user.username), 1);
-      return game.save()
-        .then(_ => {
-          res.status(200).send();
-          io.emit('receive-update', JSON.stringify(game));
-        });
+      if (game) {
+        game.players.splice(game.players.indexOf(req.user.username), 1);
+        return game.save()
+          .then(_ => {
+            res.status(200).send();
+            io.emit('receive-update', JSON.stringify(game));
+          });
+      }
     })
     .catch(err => {
       console.log(err);
