@@ -165,6 +165,9 @@ app.post('/game/join', (req, res) => {
     .then(game => {
       if (req.user.game) {
         if (req.user.game.equals(game._id)) {
+          if (!Object.keys(io.nsps).includes(game._id)) {
+            new gameServe(io.of('/'+game._id), game);
+          }
           res.status(200).send();
         } else {
           res.status(303).send({message: 'You are already in a game.'});
@@ -177,6 +180,9 @@ app.post('/game/join', (req, res) => {
               return game.save().then(game => { // again, save the game first
                 req.user.game = game._id;
                 return req.user.save().then(_ => {
+                  if (!Object.keys(io.nsps).includes(game._id)) {
+                    new gameServe(io.of('/'+game._id), game);
+                  }
                   res.status(200).send();
                   io.emit('receive-update', JSON.stringify(game));
                 });
@@ -257,13 +263,17 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('get-game-details', slug => {
-    Game.findOne({slug: slug}, (err, game) => {
+  socket.on('get-game-details', data => {
+    const info = JSON.parse(data);
+    Game.findOne({slug: info.slug}, (err, game) => {
       if (err) {
         console.log(err);
-      } else if (!game) {
+      } else if (!game || !game.players.includes(info.username)) {
         socket.emit('receive-game-details', '');
       } else {
+        if (!Object.keys(io.nsps).includes('/'+game._id)) {
+          new gameServe(io.of('/'+game._id), game);
+        }
         socket.emit('receive-game-details', JSON.stringify(game));
       }
     });

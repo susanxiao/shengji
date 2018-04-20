@@ -2,37 +2,30 @@ const React = require('react');
 const io = require('socket.io-client');
 
 import { Link, Redirect } from 'react-router-dom';
+import ChatBox from './ChatBox.js';
 
-export default class Game extends React.Component {
+export default class Lobby extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      name: '',
       started: false,
       gameSocket: null,
       slug: this.props.match.params.game,
-      username: this.props.username,
       auth: false,
       redirect: false,
       loading: true,
-      game: null,
+      game: null
     };
 
     this.props.socket.on('receive-game-details', data => {
       if (data !== '') {
         const details = JSON.parse(data);
-        this.setState({name: details.name});
-        if (this.state.username !== '' && details.players.includes(this.state.username)) {
-          if (!this.state.gameSocket) {
-            const socket = io('/'+details._id);
-            socket.emit('test');
-            this.setState({gameSocket: socket});
-            this.setState({game: details});
-            this.setState({auth: true});
-          }
-        } else {
-          this.setState({auth: false});
+        this.setState({game: details});
+        if (!this.state.gameSocket) {
+          const socket = io('/'+details._id);
+          this.setState({gameSocket: socket});
+          this.setState({auth: true});
         }
       } else {
         this.setState({auth: false});
@@ -46,7 +39,6 @@ export default class Game extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
-      this.setState({username: this.props.username || ''});
       this._getDetails();
     }
   }
@@ -56,7 +48,14 @@ export default class Game extends React.Component {
   }
 
   _getDetails() {
-    this.props.socket.emit('get-game-details', this.state.slug);
+    if (!this.props.username) {
+      this.setState({auth: false});
+    } else if (!this.state.gameSocket) {
+      this.props.socket.emit('get-game-details', JSON.stringify({
+        slug: this.state.slug,
+        username: this.props.username
+      }));
+    }
   }
 
   _leaveGame(deleteGame) {
@@ -99,9 +98,7 @@ export default class Game extends React.Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return null;
-    } else if (this.state.redirect) {
+    if (this.state.redirect) {
       return (
         <Redirect
           to={{
@@ -117,15 +114,30 @@ export default class Game extends React.Component {
           { 'You aren\'t supposed to be here.' }
           </div>
           <div>
-            <Link to='/'>Take me home.</Link>
+            <Link to='/'>Find a game.</Link>
           </div>
         </div>
       );
     } else {
       return (
         <div id='game-lobby'>
-          <h1>{ this.state.name }</h1>
+          <h1>{ this.state.game.name }</h1>
+          <div className='details'>
+            <div>
+              <div className='mode'>{ this.state.game.mode }</div>
+              <div className='decks'>{ this.state.game.numDecks } decks</div>
+            </div>
+            <div className='users'>
+              <div className='count'>Users ({ this.state.game.players.length }/{ this.state.game.maxPlayers }):</div>
+              {
+                this.state.game.players.map(player =>
+                  <div><Link to={ '/user/'+player } className='user'>{ player }</Link></div>
+                )
+              }
+            </div>
+          </div>
           { this._renderLeave() }
+          <ChatBox socket={ this.state.gameSocket } username={ this.props.username } />
         </div>
       );
     }

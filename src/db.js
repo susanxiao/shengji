@@ -38,7 +38,8 @@ const Game = new mongoose.Schema({
   players: [String],
   maxPlayers: {type: Number, required: true, default: 9},
   host: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'},
-  started: {type: Boolean, default: false}
+  started: {type: Boolean, default: false},
+  messages: [{type: String}]
 });
 
 Game.plugin(URLSlugs('name'));

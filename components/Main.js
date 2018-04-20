@@ -2,9 +2,8 @@ const React = require('react');
 import Games from './Games.js';
 import Scoreboard from './Scoreboard.js';
 import User from './User.js';
-import Game from './Game.js';
+import Lobby from './Lobby.js';
 
-import { AppContext } from './App.js';
 import { Switch, Route } from 'react-router-dom';
 
 export default class Main extends React.Component {
@@ -42,7 +41,7 @@ export default class Main extends React.Component {
           />
           <Route path='/game/:game'
             render={ ({match}) => (
-              <Game {...this.state} match={ match } />
+              <Lobby {...this.state} match={ match } />
             ) }
           />
         </Switch>
