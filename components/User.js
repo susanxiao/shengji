@@ -7,7 +7,6 @@ export default class User extends React.Component {
 
     this.state = {
       error: '',
-      username: '',
       roundWins: 0,
       gameWins: 0,
       playedWith: 0,
@@ -97,7 +96,7 @@ export default class User extends React.Component {
         <Fragment>
           <div>
             {'You have played with ' }
-            <span className='user'>{ this.state.username }</span>
+            <span className='user'>{ this.props.match.params.username }</span>
             { ' ' + this.state.playedWith + ' times.' }
           </div>
           <div className='bio'>
@@ -114,7 +113,7 @@ export default class User extends React.Component {
     } else {
       return (
         <div id='user-details'>
-          <h1 className='user'>{ this.state.username }</h1>
+          <h1 className='user'>{ this.props.match.params.username }</h1>
           <div>
             <h3>Round Wins</h3>
             { this.state.roundWins }

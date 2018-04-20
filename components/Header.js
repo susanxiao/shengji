@@ -24,9 +24,8 @@ export default class Header extends React.Component {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       credentials: 'same-origin',
-      body: username
+      body: data
     }).then(response => {
-      console.log(response);
       if (response.status === 200) {
           this.props.loginHandler(null);
       }
@@ -62,7 +61,7 @@ export default class Header extends React.Component {
       return (
         <div>
           <Link
-            to={{ pathname: '/users/' + this.props.username }}
+            to={{ pathname: '/user/' + this.props.username }}
             className='user'
           >
             { this.props.username }
