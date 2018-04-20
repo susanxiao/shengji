@@ -79,7 +79,12 @@ export default class User extends React.Component {
     if (this.state.self) {
       return (
         <Fragment>
-          <textarea id='edit' className='bio' value={ this.state.description } onChange={ this._handleBio }>
+          <textarea
+            id='edit'
+            className={ 'bio ' + (this.state.description === this.state.prevDescription ? ' disable' : '') }
+            value={ this.state.description }
+            onChange={ this._handleBio }
+          >
           </textarea>
           <div className='button-wrapper'>
             <div id='save-button'

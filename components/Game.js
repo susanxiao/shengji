@@ -14,24 +14,28 @@ export default class Game extends React.Component {
       slug: this.props.match.params.game,
       username: this.props.username,
       auth: false,
-      redirect: false
+      redirect: false,
+      loading: true
     };
 
     this.props.socket.on('receive-game-details', data => {
       if (data !== '') {
         const details = JSON.parse(data);
         this.setState({name: details.name});
-        if (
-          this.props.username !== '' &&
-          details.players.includes(this.props.username) &&
-          !this.state.gameSocket
-        ) {
-          const socket = io('/'+details._id);
-          socket.emit('test');
-          this.setState({gameSocket: socket});
-          this.setState({auth: true});
+        if (this.state.username !== '' && details.players.includes(this.state.username)) {
+          if (!this.state.gameSocket) {
+            const socket = io('/'+details._id);
+            socket.emit('test');
+            this.setState({gameSocket: socket});
+            this.setState({auth: true});
+          }
+        } else {
+          this.setState({auth: false});
         }
+      } else {
+        this.setState({auth: false});
       }
+      this.setState({loading: false});
     });
 
     this._getDetails = this._getDetails.bind(this);
@@ -40,6 +44,7 @@ export default class Game extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
+      this.setState({username: this.props.username || ''});
       this._getDetails();
     }
   }
@@ -69,7 +74,9 @@ export default class Game extends React.Component {
   }
 
   render() {
-    if (this.state.redirect) {
+    if (this.state.loading) {
+      return null;
+    } else if (this.state.redirect) {
       return (
         <Redirect
           to={{

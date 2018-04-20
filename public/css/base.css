@@ -206,6 +206,11 @@ a:hover {
   border: 1px solid black;
 }
 
+#user-details .bio.disable#edit {
+  border: none;
+  border-top: 1px solid #999;
+}
+
 #round-wins, #game-wins {
   flex-basis: 50%;
   justify-content: center;
@@ -243,8 +248,14 @@ a:hover {
   margin: 10px;
 }
 
-input, .button, .disable {
+input, .button {
   border: 1px solid black;
+  padding: 10px;
+  display: inline-block;
+}
+
+.disable {
+  border: 1px solid #999;
   padding: 10px;
   display: inline-block;
 }
