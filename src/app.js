@@ -165,7 +165,7 @@ app.post('/game/join', (req, res) => {
     .then(game => {
       if (req.user.game) {
         if (req.user.game.equals(game._id)) {
-          if (!Object.keys(io.nsps).includes(game._id)) {
+          if (!Object.keys(io.nsps).includes('/'+game._id)) {
             new gameServe(io.of('/'+game._id), game);
           }
           res.status(200).send();
@@ -180,7 +180,7 @@ app.post('/game/join', (req, res) => {
               return game.save().then(game => { // again, save the game first
                 req.user.game = game._id;
                 return req.user.save().then(_ => {
-                  if (!Object.keys(io.nsps).includes(game._id)) {
+                  if (!Object.keys(io.nsps).includes('/'+game._id)) {
                     new gameServe(io.of('/'+game._id), game);
                   }
                   res.status(200).send();
