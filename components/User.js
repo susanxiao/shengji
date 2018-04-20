@@ -114,7 +114,7 @@ export default class User extends React.Component {
     } else {
       return (
         <div id='user-details'>
-          <h1>{ this.state.username }</h1>
+          <h1 className='user'>{ this.state.username }</h1>
           <div>
             <h3>Round Wins</h3>
             { this.state.roundWins }

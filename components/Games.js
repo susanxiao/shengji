@@ -55,14 +55,15 @@ export default class Games extends React.Component {
       popup: null
     };
 
-    this.props.socket.on('get-game-all', (data) => {
+    this.props.socket.on('receive-game-all', (data) => {
       const games = JSON.parse(data);
       this.setState({games: games});
     });
 
-    this.props.socket.on('get-game', (data) => {
-      const game = JSON.parse(game);
-      const games = this.state.games.push(game);
+    this.props.socket.on('receive-game', (data) => {
+      const game = JSON.parse(data);
+      const games = this.state.games;
+      games.push(game);
       this.setState({games: games});
     });
 

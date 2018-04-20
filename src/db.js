@@ -17,10 +17,11 @@ const Player = new mongoose.Schema({
   description: {type: String, default: ''},
   roundWins: {type: Number, default: 0},
   gameWins: {type: Number, default: 0},
-  games: [{
+  game: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Game'
-  }],
+    ref: 'Game',
+    default: null
+  },
   usersPlayedWith: [{
     user: {type: String, required: true},
     times: {type:Number, required: true, default: 0}

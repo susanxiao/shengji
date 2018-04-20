@@ -94,7 +94,7 @@ class Login extends React.Component {
         <i className="fas fa-times close-button" onClick={() => this.props.popupHandler({type: 'close'})}></i>
         <form className='auth'>
           <h1>Login</h1>
-          { this.state.error ? <div id='error'>{ this.state.error }</div> : null }
+          { this.state.error ? <div id='error'><div>{ this.state.error }</div></div> : null }
           <div id='username'>
               <label>Username:</label>
               <input type='text' name='username' value={ this.state.username } onChange={ this._handleUsername } />
@@ -167,7 +167,7 @@ class Register extends React.Component {
         <i className="fas fa-times close-button" onClick={() => this.props.popupHandler({type: 'close'})}></i>
         <form className='auth'>
           <h1>Register</h1>
-          { this.state.error ? <div id='error'>{ this.state.error }</div> : null }
+          { this.state.error ? <div id='error'><div>{ this.state.error }</div></div> : null }
           <div id='username'>
               <label>Username:</label>
               <input type='text' name='username' value={ this.state.username } onChange={ this._handleUsername } />

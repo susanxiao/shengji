@@ -40,6 +40,10 @@ export class JoinPopup extends React.Component {
     }
   }
 
+  _joinGame(slug) {
+
+  }
+
   render() {
     return (
       <div id="join-form">
@@ -54,9 +58,9 @@ export class JoinPopup extends React.Component {
                 <div className="decks">{ this.props.numDecks } decks</div>
               </div>
               <div className='users'>
-                <div className='count'>Users ({ this.state.players.length }/{ this.state.maxPlayers }):</div>
+                <div className='count'>Users ({ this.props.players.length }/{ this.props.maxPlayers }):</div>
                 {
-                  this.state.players.map(player =>
+                  this.props.players.map(player =>
                     <div><Link to={ '/user/'+player } className='user'>{ player }</Link></div>
                   )
                 }
@@ -67,7 +71,7 @@ export class JoinPopup extends React.Component {
               <div
                 className='button'
                 id='join-game'
-                onClick={ this._joinGame(this.props.slug) }
+                onClick={ () => this._joinGame(this.props.slug) }
               >
                 Join
               </div>

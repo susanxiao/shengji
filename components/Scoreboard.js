@@ -10,12 +10,12 @@ export default class Scoreboard extends React.Component {
       gameWins: []
     };
 
-    this.props.socket.on('get-wins-round', (data) => {
+    this.props.socket.on('receive-wins-round', (data) => {
       const players = JSON.parse(data);
       this.setState({roundWins: players});
     });
 
-    this.props.socket.on('get-wins-game', (data) => {
+    this.props.socket.on('receive-wins-game', (data) => {
       const players = JSON.parse(data);
       this.setState({gameWins: players});
     });

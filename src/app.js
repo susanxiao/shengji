@@ -11,6 +11,8 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = require('path');
 
+const bcrypt = require('bcryptjs');
+
 require('./db.js');
 const mongoose = require('mongoose');
 const Game = mongoose.model('Game');
@@ -114,6 +116,41 @@ app.post('/user/:username', (req, res) => {
   }
 });
 
+app.post('/game/create', (req, res) => {
+  if (req.user.game) {
+    res.status(303).send({message: 'You are already in a game.'});
+  } else {
+    Game.findOne({name: req.body.name}).exec()
+      .then(game => {
+        if (game) {
+          res.status(303).send({message: 'Name already exists.'});
+        } else {
+          return createGame = bcrypt.hash((req.body.password || ''), 10)
+            .then(hash => {
+              const details = req.body;
+              details.players = [];
+              details.players.push(req.user.username); //add user to game, if below fails to save then we are in trouble
+              if (details.password) {
+                details.password = hash;
+              }
+              return new Game(details).save();
+            })
+            .then(game => {
+              req.user.game = game._id;
+              return req.user.save().then(_ => {
+                res.status(200).send();
+                io.emit('receive-game', JSON.stringify(game));
+              });
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(500).send();
+            });
+        }
+      });
+  }
+});
+
 io.on('connection', (socket) => {
   let user;
   // TODO: this is to avoid losing the user on refresh...should be a better way
@@ -143,7 +180,7 @@ io.on('connection', (socket) => {
       if (err) {
         console.log(err);
       } else {
-        socket.emit('get-game-all', JSON.stringify(games));
+        socket.emit('receive-game-all', JSON.stringify(games));
       }
     });
   });
@@ -153,7 +190,7 @@ io.on('connection', (socket) => {
       if (err) {
         console.log(err);
       } else {
-        socket.emit('get-wins-round', JSON.stringify(rounds.map(round => {
+        socket.emit('receive-wins-round', JSON.stringify(rounds.map(round => {
           return {
             username: round.username,
             wins: round.roundWins
@@ -166,7 +203,7 @@ io.on('connection', (socket) => {
       if (err) {
         console.log(err);
       } else {
-        socket.emit('get-wins-game', JSON.stringify(games.map(game => {
+        socket.emit('receive-wins-game', JSON.stringify(games.map(game => {
           return {
             username: game.username,
             wins: game.gameWins
