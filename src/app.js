@@ -161,11 +161,15 @@ app.post('/game/create', (req, res) => {
 });
 
 app.post('/game/join', (req, res) => {
-  if (req.user.game) {
-    res.status(303).send({message: 'You are already in a game.'});
-  } else {
-    Game.findOne({slug: req.body.slug}).exec()
-      .then(game => {
+  Game.findOne({slug: req.body.slug}).exec()
+    .then(game => {
+      if (req.user.game) {
+        if (req.user.game.equals(game._id)) {
+          res.status(200).send();
+        } else {
+          res.status(303).send({message: 'You are already in a game.'});
+        }
+      } else {
         return bcrypt.compare((req.body.password || ''), (game.password || ''))
           .then(match => {
             if (!game.password || match) {
@@ -181,12 +185,12 @@ app.post('/game/join', (req, res) => {
               res.status(303).send({message: 'Wrong password.'});
             }
           });
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).send();
-      });
-  }
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send();
+    });
 });
 
 app.post('/game/leave', (req, res) => {

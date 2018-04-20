@@ -18,11 +18,14 @@ export default class Game extends React.Component {
     };
 
     this.props.socket.on('receive-game-details', data => {
-      if (data === '') {
-        this.setState({redirect: true});
-      } else if (this.props.username !== '') {
+      if (data !== '') {
         const details = JSON.parse(data);
-        if (details.players.includes(this.props.username) && !this.state.gameSocket) {
+        this.setState({name: details.name});
+        if (
+          this.props.username !== '' &&
+          details.players.includes(this.props.username) &&
+          !this.state.gameSocket
+        ) {
           const socket = io('/'+details._id);
           socket.emit('test');
           this.setState({gameSocket: socket});
@@ -89,7 +92,7 @@ export default class Game extends React.Component {
     } else {
       return (
         <div id='game-lobby'>
-          <h1>{ this.state.slug }</h1>
+          <h1>{ this.state.name }</h1>
           <div className='button-wrapper'>
             <div className='button' onClick={ this._leaveGame } >Leave game</div>
           </div>

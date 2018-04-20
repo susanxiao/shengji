@@ -120,6 +120,7 @@ export default class Games extends React.Component {
           <Fragment>
             <div id='overlay'></div>
             <JoinPopup
+              username={ this.props.username }
               slug={ this.state.popup.slug }
               password={ this.state.popup.password }
               name={ this.state.popup.name }
