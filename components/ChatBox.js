@@ -1,4 +1,5 @@
 const React = require('react');
+import { animateScroll } from "react-scroll";
 
 export default class ChatBox extends React.Component {
   constructor(props) {
@@ -35,8 +36,14 @@ export default class ChatBox extends React.Component {
   _handleKeyPress(evt) {
     if (evt.key === 'Enter') {
       this.props.socket.emit('add-message', this.props.username + ': ' + this.state.message);
-      this.setState({message: ''});
+      this.setState({message: ''}, this._scrollToBottom);
     }
+  }
+
+  _scrollToBottom() {
+    animateScroll.scrollToBottom({
+      containerId: 'messages'
+    });
   }
 
   render() {
