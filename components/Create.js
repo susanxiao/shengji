@@ -1,4 +1,5 @@
 const React = require('react');
+import { Redirect } from 'react-router-dom';
 
 export class CreateButton extends React.Component {
   constructor(props) {
@@ -26,7 +27,9 @@ export class CreatePopup extends React.Component {
       mode: 'shengji',
       numDecks: '2',
       maxPlayers: '9',
-      error: ''
+      error: '',
+      redirect: false,
+      slug: '',
     };
 
     this._createGame = this._createGame.bind(this);
@@ -60,18 +63,16 @@ export class CreatePopup extends React.Component {
         },
         credentials: 'same-origin',
         body: data
-      }).then(response => {
-        if (response.status === 200) {
-          // TODO: redirect to game/slug
-          this.setState({error: ''});
-          this.props.popupHandler({type: 'close'});
-        } else {
-          return response.json().then(data => {
-            if (data.message) {
-              this.setState({error: data.message});
-            }
-          });
-        }
+      }).then(response => response.json()).then(
+        data => {
+          if (data.message) {
+            this.setState({error: data.message});
+          } else {
+            this.setState({error: ''});
+            this.setState({slug: data.slug});
+            this.setState({redirect: true});
+            this.props.popupHandler({type: 'close'});
+          }
       });
     }
   }
@@ -97,6 +98,22 @@ export class CreatePopup extends React.Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      return (
+        <Redirect
+          to={{
+            pathname: '/game/'+this.state.slug
+          }}
+        />
+      );
+    } else {
+      return (
+         this._renderPopup()
+      );
+    }
+  }
+
+  _renderPopup() {
     return (
       <div id='create-form'>
         <i className='fas fa-times close-button' onClick={() => this.props.popupHandler({type: 'close'})}></i>

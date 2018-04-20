@@ -1,5 +1,5 @@
 const React = require('react');
-import { Link } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 
 export class JoinButton extends React.Component {
   constructor(props) {
@@ -35,7 +35,8 @@ export class JoinPopup extends React.Component {
 
     this.state = {
       error: '',
-      password: ''
+      password: '',
+      redirect: false
     };
 
     this._handlePassword = this._handlePassword.bind(this);
@@ -71,8 +72,8 @@ export class JoinPopup extends React.Component {
         body: data
       }).then(response => {
         if (response.status === 200) {
-          // TODO: redirect to game/slug
           this.setState({error: ''});
+          this.setState({redirect: true});
           this.props.popupHandler({type: 'close'});
         } else {
           return response.json().then(data => {
@@ -86,6 +87,22 @@ export class JoinPopup extends React.Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      return (
+        <Redirect
+          to={{
+            pathname: '/game/'+this.state.slug
+          }}
+        />
+      );
+    } else {
+      return (
+         this._renderPopup()
+      );
+    }
+  }
+
+  _renderPopup() {
     return (
       <div id='join-form'>
         <i className='fas fa-times close-button' onClick={() => this.props.popupHandler({type: 'close'})}></i>

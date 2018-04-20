@@ -138,7 +138,7 @@ app.post('/game/create', (req, res) => {
             .then(game => {
               req.user.game = game._id;
               return req.user.save().then(_ => {
-                res.status(200).send();
+                res.status(200).send(game);
                 io.emit('receive-game', JSON.stringify(game));
               });
             })

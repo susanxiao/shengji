@@ -17,13 +17,14 @@ export default class Header extends React.Component {
   }
 
   _handleLogout() {
+    const data = 'username='+this.props.username;
     fetch('/logout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       credentials: 'same-origin',
-      body: 'username='+this.props.username
+      body: username
     }).then(response => {
       console.log(response);
       if (response.status === 200) {
