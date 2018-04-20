@@ -198,8 +198,11 @@ app.post('/game/leave', (req, res) => {
   req.user.save()
     .then(_ => {
       if (req.body.delete) {
-        Game.findOneAndRemove({slug: req.body.slug}).exec();
-        res.status(200).send();
+        Game.findOneAndRemove({slug: req.body.slug}).exec().then(
+          game => {
+            res.status(200).send();
+            io.emit('receive-removal', JSON.stringify(game));
+        });
       } else {
         return Game.findOne({slug: req.body.slug}).exec();
       }

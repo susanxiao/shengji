@@ -78,11 +78,25 @@ export default class Games extends React.Component {
       this.setState({games: games});
     });
 
+    this.props.socket.on('receive-removal', (data) => {
+      const game = JSON.parse(data);
+      console.log(game);
+      const games = this.state.games;
+      games.some((g, index) => {
+        if (g._id === game._id) {
+          games.splice(index, 1);
+          return true;
+        }
+        return false;
+      });
+      this.setState({games: games});
+    });
+
     this.props.socket.on('receive-update', (data) => {
       const game = JSON.parse(data);
       const games = this.state.games;
-      this.state.games.some((g, index) => {
-        if (g.slug === game.slug) {
+      games.some((g, index) => {
+        if (g._id === game._id) {
           games.splice(index, 1, game);
           return true;
         }
