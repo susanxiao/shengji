@@ -199,9 +199,12 @@ app.post('/game/leave', (req, res) => {
     .then(_ => Game.findOne({slug: req.body.slug}).exec())
     .then(game => {
       game.players.splice(game.players.indexOf(req.user.username), 1);
-      return game.save();
+      return game.save()
+        .then(_ => {
+          res.status(200).send();
+          io.emit('receive-update', JSON.stringify(game));
+        });
     })
-    .then(_ => res.status(200).send())
     .catch(err => {
       console.log(err);
       res.status(500).send();

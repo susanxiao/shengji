@@ -59,7 +59,11 @@ export class JoinPopup extends React.Component {
   }
 
   _joinGame(slug) {
-    if (this.props.password && !this.state.password && !this.props.players.includes(this.props.username)) {
+    if (
+      this.props.password &&
+      !this.state.password &&
+      !this.props.players.includes(this.props.username)
+    ) {
       this.setState({error: 'Please enter the password.'});
     } else {
       const data = 'slug='+slug+(this.props.password ? '&password=' + this.state.password : '');

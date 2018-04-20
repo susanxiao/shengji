@@ -98,6 +98,12 @@ export default class Games extends React.Component {
     this.props.socket.emit('get-game-all');
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.setState({username: this.props.username});
+    }
+  }
+
   _handlePopup(popup) {
     if (popup.type === 'close') {
       this.setState({popup: null});
@@ -120,7 +126,7 @@ export default class Games extends React.Component {
           <Fragment>
             <div id='overlay'></div>
             <JoinPopup
-              username={ this.props.username }
+              username={ this.state.username }
               slug={ this.state.popup.slug }
               password={ this.state.popup.password }
               name={ this.state.popup.name }
