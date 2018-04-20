@@ -39,22 +39,25 @@ app.use(
   express.urlencoded({ extended: false }),
   sessionConfig,
   passport.initialize(),
-  passport.session()
+  passport.session(),
+  (req, res, next) => {
+    if (req.method === 'GET') {
+      res.sendFile(path.join(__dirname, '..', 'public', 'index.html'), (err) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send(err);
+        }
+      });
+    } else {
+      next();
+    }
+  }
 );
 
 // https://stackoverflow.com/questions/13095418/how-to-use-passport-with-express-and-socket-io
 io.use((socket, next) => {
   sessionConfig(socket.request, {}, next);
 })
-
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'), (err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send(err);
-    }
-  });
-});
 
 // https://stackoverflow.com/questions/21855650/passport-authenticate-callback-is-not-passed-req-and-res
 app.post('/login', (req, res) => {
