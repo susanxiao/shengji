@@ -42,7 +42,7 @@ export default class Scoreboard extends React.Component {
           (
             <div>
               <i className={ 'fas fa-trophy fa-2x ' + this._getTrophy(index) }></i>
-              <a className='user' href='/user/{ round.username }'>{ round.username }</a>
+              <a className='user' href={'/user/' + round.username }>{ round.username }</a>
               <span>{ round.wins }</span>
             </div>
           )
@@ -58,7 +58,7 @@ export default class Scoreboard extends React.Component {
           (
             <div>
               <i className={ 'fas fa-trophy fa-2x ' + this._getTrophy(index) }></i>
-              <a className='user' href='/user/{ round.username }'>{ game.username }</a>
+              <a className='user' href={ '/user/' + round.username }>{ game.username }</a>
               <span>{ game.wins }</span>
             </div>
           )
