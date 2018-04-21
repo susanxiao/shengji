@@ -36,7 +36,7 @@ export default class User extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.username !== this.props.username) {
-      this._getDetails()
+      this._getDetails();
     }
   }
 
@@ -47,15 +47,11 @@ export default class User extends React.Component {
   _getDetails() {
     const visitor = this.props.username;
     const visitee = this.props.match.params.username;
-    if (visitor === visitee) {
-      this.setState({self: true});
-    } else {
-      this.props.socket.emit('get-user', JSON.stringify({
-        visitor: visitor,
-        visitee: visitee
-      }));
-      this.setState({self: false});
-    }
+    this.setState({self: visitor === visitee});
+    this.props.socket.emit('get-user', JSON.stringify({
+      visitor: visitor,
+      visitee: visitee
+    }));
   }
 
   _save() {
