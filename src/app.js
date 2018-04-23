@@ -102,8 +102,46 @@ app.post('/register', (req, res) => {
 
 app.post('/logout', (req, res) => {
   if (req.body.username === req.user.username) {
-    req.logout();
-    res.status(200).send();
+    if (req.user.game) {
+      Game.findOne({_id: req.user.game}).exec().then(game => {
+        if (!game.started) {
+          req.user.game = null;
+          return req.user.save()
+            .then(_ => {
+              game.players.splice(game.players.indexOf(req.user.username), 1);
+              if (game.players.length === 0 && game.password) {
+                return Game.findOneAndRemove({_id: game._id}).exec().then(_ => {
+                  req.logout();
+                  res.status(200).send();
+                  if (io.nsps['/'+game._id]) {
+                    delete io.nsps['/'+game._id];
+                    gameServe.remove(game._id);
+                  } else {
+                    console.log('Could not remove ' + game._id + ' from namespaces');
+                  }
+                  io.emit('receive-removal', JSON.stringify(game));
+                });
+              } else {
+                return game.save().then(_ => {
+                  req.logout();
+                  res.status(200).send();
+                  io.emit('receive-update', JSON.stringify(game));
+                  if (gameServe.find(game._id)) {
+                    gameServe.find(game._id).remove(req.user.username);
+                  }
+                });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(500).send();
+            });
+        }
+      });
+    } else {
+      req.logout();
+      res.status(200).send();
+    }
   } else {
     res.status(303).send();
   }
