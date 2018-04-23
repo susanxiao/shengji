@@ -21,6 +21,10 @@ body, html {
   margin: 0;
 }
 
+#game-lobby {
+  justify-content: center;
+}
+
 #game-lobby, #game-lobby > div {
   width: 100%;
   text-align: center;
@@ -36,6 +40,19 @@ body, html {
 #game-lobby .users > div, #game-lobby .details > div > div {
   display: inline-block;
   margin: 10px;
+}
+
+#game-lobby .waiting-bar {
+  background-color: #d8c69c;
+  animation-name: bar;
+  animation-duration: 10s;
+  height: 25px;
+  margin: 0 auto;
+}
+
+@keyframes bar {
+  from {width: 100%;}
+  to {width: 0px;}
 }
 
 a, a:visited {
@@ -142,7 +159,11 @@ a:hover {
   top: 50px;
 }
 
-#create-form, #join-form, #login-form, #register-form {
+#start-popup {
+  max-width: 50%;
+}
+
+#create-form, #join-form, #login-form, #register-form, #start-popup {
   position: absolute;
   background: #fff;
   padding: 50px 100px;
@@ -239,6 +260,7 @@ a:hover {
 }
 
 #user-details .bio#edit {
+  margin: 10px;
   border: 1px solid black;
 }
 
@@ -297,6 +319,7 @@ input, .button {
 .disable {
   border: 1px solid #999;
   padding: 10px;
+  margin: 10px;
   display: inline-block;
 }
 

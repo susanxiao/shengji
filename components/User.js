@@ -18,7 +18,7 @@ export default class User extends React.Component {
     this._handleBio = this._handleBio.bind(this);
     this._save = this._save.bind(this);
 
-    this.props.socket.on('get-user', data => {
+    this.props.socket.on('receive-user', data => {
       const details = JSON.parse(data);
       if (details.error) {
         this.setState({error: details.error});

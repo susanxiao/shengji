@@ -137,7 +137,7 @@ class Register extends React.Component {
   }
 
   _register() {
-    if (!this.state.username) {
+    if (!this.state.username) { // TODO: username should not have spaces
       this.setState({error: 'Please enter a username.'});
     } else if (!this.state.password) {
       this.setState({error: 'Please enter a password'});

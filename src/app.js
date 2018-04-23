@@ -148,7 +148,7 @@ app.post('/game/create', (req, res) => {
               return req.user.save().then(_ => {
                 res.status(200).send(game);
                 io.emit('receive-game', JSON.stringify(game));
-                new gameServe(io.of('/'+game._id), game);
+                new gameServe.Server(io.of('/'+game._id), game).add(req.user.username);
               });
             })
             .catch(err => {
@@ -165,8 +165,8 @@ app.post('/game/join', (req, res) => {
     .then(game => {
       if (req.user.game) {
         if (req.user.game.equals(game._id)) {
-          if (!Object.keys(io.nsps).includes('/'+game._id)) {
-            new gameServe(io.of('/'+game._id), game);
+          if (!gameServe.find(game._id)) {
+            new gameServe.Server(io.of('/'+game._id), game);
           }
           res.status(200).send();
         } else {
@@ -180,10 +180,12 @@ app.post('/game/join', (req, res) => {
               return game.save().then(game => { // again, save the game first
                 req.user.game = game._id;
                 return req.user.save().then(_ => {
-                  if (!Object.keys(io.nsps).includes('/'+game._id)) {
-                    new gameServe(io.of('/'+game._id), game);
-                  }
                   res.status(200).send();
+                  if (!gameServe.find(game._id)) {
+                    new gameServe.Server(io.of('/'+game._id), game).add(req.user.username);
+                  } else {
+                    gameServe.find(game._id).add(req.user.username);
+                  }
                   io.emit('receive-update', JSON.stringify(game));
                 });
               })
@@ -207,6 +209,12 @@ app.post('/game/leave', (req, res) => {
         Game.findOneAndRemove({slug: req.body.slug}).exec().then(
           game => {
             res.status(200).send();
+            if (io.nsps['/'+game._id]) {
+              delete io.nsps['/'+game._id];
+              gameServe.remove(game._id);
+            } else {
+              console.log('Could not remove ' + game._id + ' from namespaces');
+            }
             io.emit('receive-removal', JSON.stringify(game));
         });
       } else {
@@ -220,6 +228,9 @@ app.post('/game/leave', (req, res) => {
           .then(_ => {
             res.status(200).send();
             io.emit('receive-update', JSON.stringify(game));
+            if (gameServe.find(game._id)) {
+              gameServe.find(game._id).remove(req.user.username);
+            }
           });
       }
     })
@@ -271,8 +282,8 @@ io.on('connection', (socket) => {
       } else if (!game || !game.players.includes(info.username)) {
         socket.emit('receive-game-details', '');
       } else {
-        if (!Object.keys(io.nsps).includes('/'+game._id)) {
-          new gameServe(io.of('/'+game._id), game);
+        if (!gameServe.find(game._id)) {
+          new gameServe.Server(io.of('/'+game._id), game);
         }
         socket.emit('receive-game-details', JSON.stringify(game));
       }
@@ -313,7 +324,7 @@ io.on('connection', (socket) => {
       if (err) {
         console.log(err);
       } else if (!player) {
-        socket.emit('get-user', JSON.stringify({error: 'User does not exist.'}));
+        socket.emit('receive-user', JSON.stringify({error: 'User does not exist.'}));
       } else {
         let playedWith = 0;
         player.usersPlayedWith.some(user => {
@@ -324,7 +335,7 @@ io.on('connection', (socket) => {
           return false;
         });
 
-        socket.emit('get-user', JSON.stringify({
+        socket.emit('receive-user', JSON.stringify({
           username: player.username,
           roundWins: player.roundWins,
           gameWins: player.gameWins,
