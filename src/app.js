@@ -148,7 +148,7 @@ app.post('/game/create', (req, res) => {
               return req.user.save().then(_ => {
                 res.status(200).send(game);
                 io.emit('receive-game', JSON.stringify(game));
-                new gameServe.Server(io.of('/'+game._id), game).add(req.user.username);
+                new gameServe.Server(io, io.of('/'+game._id), game).add(req.user.username);
               });
             })
             .catch(err => {
@@ -166,7 +166,7 @@ app.post('/game/join', (req, res) => {
       if (req.user.game) {
         if (req.user.game.equals(game._id)) {
           if (!gameServe.find(game._id)) {
-            new gameServe.Server(io.of('/'+game._id), game);
+            new gameServe.Server(io, io.of('/'+game._id), game);
           }
           res.status(200).send();
         } else {
@@ -182,7 +182,7 @@ app.post('/game/join', (req, res) => {
                 return req.user.save().then(_ => {
                   res.status(200).send();
                   if (!gameServe.find(game._id)) {
-                    new gameServe.Server(io.of('/'+game._id), game).add(req.user.username);
+                    new gameServe.Server(io, io.of('/'+game._id), game).add(req.user.username);
                   } else {
                     gameServe.find(game._id).add(req.user.username);
                   }
@@ -283,7 +283,7 @@ io.on('connection', (socket) => {
         socket.emit('receive-game-details', '');
       } else {
         if (!gameServe.find(game._id)) {
-          new gameServe.Server(io.of('/'+game._id), game);
+          new gameServe.Server(io, io.of('/'+game._id), game);
         }
         socket.emit('receive-game-details', JSON.stringify(game));
       }

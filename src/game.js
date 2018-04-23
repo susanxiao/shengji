@@ -5,10 +5,10 @@ const Player = mongoose.model('Player');
 const all = [];
 
 class Server {
-  constructor(io, game) {
+  constructor(io, nsp, game) {
     this.checkPlayers = this.checkPlayers.bind(this);
 
-    io.on('connection', (socket) => {
+    nsp.on('connection', (socket) => {
       socket.on('get-message-all', _ => {
         socket.emit('receive-message-all', JSON.stringify(game.messages));
       });
@@ -16,13 +16,13 @@ class Server {
       socket.on('add-message', message => {
         game.messages.push(message);
         game.save().then(_ => {
-          io.emit('receive-message', message);
+          nsp.emit('receive-message', message);
         });
       });
 
       socket.on('start-bar', _ => {
         this.players = [];
-        io.emit('start-bar');
+        nsp.emit('start-bar');
       });
 
       socket.on('end-queue', this.checkPlayers);
@@ -38,33 +38,43 @@ class Server {
         if (Object.keys(io.connected).length === 0) {
           // reference: https://stackoverflow.com/questions/26400595/socket-io-how-do-i-remove-a-namespace
           // namespace gets deleted from server when someone actually deletes the game
-          io.removeAllListeners();
+          nsp.removeAllListeners();
           remove(game._id);
         }
       });
     });
     this.io = io;
+    this.nsp = nsp;
     this.game = game;
     all.push(this);
     return this;
   }
 
   checkPlayers() {
-    for (let socket in this.io.sockets) {
-      this.io.sockets[socket].removeListener('end-queue', this.checkPlayers);
+    for (let socket in this.nsp.sockets) {
+      this.nsp.sockets[socket].removeListener('end-queue', this.checkPlayers);
     }
 
     let canStart = true;
+    const messages = [];
     this.game.players.forEach(player => {
       if (!this.players.includes(player)) {
         const message = player + ' failed to start.';
-        this.io.emit('receive-message', message);
+        messages.push(message);
         canStart = false;
       }
     });
 
-    if (canStart) { // TODO: this
-      console.log('start game!');
+    if (canStart) {
+      this.game.started = true;
+      this.game.save().then(_ => {
+        this.io.emit('receive-removal', JSON.stringify(this.game));
+      });
+    } else {
+      this.game.messages.push(...messages);
+      this.game.save().then(_ => {
+        messages.forEach(message => this.nsp.emit('receive-message', message));
+      });
     }
   }
 
@@ -72,8 +82,8 @@ class Server {
     const message = username + ' has left the game.';
     this.game.messages.push(message);
     this.game.save().then(_ => {
-      this.io.emit('receive-message', message);
-      this.io.emit('receive-leave', username);
+      this.nsp.emit('receive-message', message);
+      this.nsp.emit('receive-leave', username);
     });
   }
 
@@ -81,8 +91,8 @@ class Server {
     const message = username + ' has joined the game.';
     this.game.messages.push(message);
     this.game.save().then(_ => {
-      this.io.emit('receive-message', message);
-      this.io.emit('receive-join', username);
+      this.nsp.emit('receive-message', message);
+      this.nsp.emit('receive-join', username);
     });
   }
 }
