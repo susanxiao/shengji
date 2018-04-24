@@ -6,10 +6,7 @@ const MURL = process.env.MURL || config.url;
 const MUSER = process.env.MUSER || config.user;
 const MPASS = process.env.MPASS || config.password;
 
-const MODE = {
-  shengji: 'shengji',
-  zhaopengyou: 'zhaopengyou'
-};
+const MODE = require('../utils/enums/mode.js');
 
 const Player = new mongoose.Schema({
   username: {type: String, required: true},

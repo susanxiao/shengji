@@ -90,9 +90,10 @@ a:hover {
   align-items: center;
   justify-content: center;
 }
- #chatbox > input {
-   width: 50%;
- }
+
+#chatbox > input {
+  width: 50%;
+}
 
 #chatbox > ul#messages {
   padding: 10px;
@@ -243,6 +244,36 @@ a:hover {
   align-items: center;
 }
 
+#platform {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+}
+
+#platform > #game-platform {
+  flex-grow: 3;
+  margin: 10px;
+}
+
+#platform > #chatbox {
+  flex-grow: 1;
+  margin: 20px;
+}
+
+#platform > #chatbox > ul#messages {
+  height: 100%;
+  width: 100%;
+  margin: 9px;
+  padding: 10px;
+}
+
+#platform > #chatbox > input {
+  width: 100%;
+  padding: 10px;
+}
+
 #scoreboard, #user-details {
   display: flex;
   flex-direction: column;
@@ -363,6 +394,53 @@ input[type='submit']:hover, .button:hover {
 
 .hidden {
   display: none;
+}
+
+.hand > .card {
+  position: relative;
+  display: inline-flex;
+}
+
+.hand > .card:not(:first-child) {
+  right: 140px;
+}
+
+.card {
+  border: 1px solid black;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  width: 150px;
+  height: 225px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 24px;
+}
+
+.card .code {
+  line-height: 20px;
+}
+
+.card > .topLeft {
+  align-self: flex-start;
+}
+
+.card > .bottomRight {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  transform: rotate(180deg);
+}
+
+.card.red {
+  color: #bc2d2d;
+}
+
+.card.black {
+  color: #000;
 }
 
 #header {

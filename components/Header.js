@@ -79,7 +79,7 @@ export default class Header extends React.Component {
     }
   }
 
-  render() {
+  render() { // TODO: lock the links when game is in play, all urls redirect to game page
     return (
       <Fragment>
         <div id='header'>

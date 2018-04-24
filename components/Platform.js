@@ -1,18 +1,20 @@
 const React = require('react');
-const io = require('socket.io-client');
-
+import Hand from './Hand.js';
 import ChatBox from './ChatBox.js';
 
 export default class Platform extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      waiting: true
-    }
   }
 
   render() {
-    return null;
+    return (
+      <div id='platform'>
+        <div id='game-platform'>
+          <Hand />
+        </div>
+        <ChatBox socket={ this.props.socket } />
+      </div>
+    );
   }
 }
