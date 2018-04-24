@@ -35,7 +35,7 @@ class Server {
       });
 
       socket.on('disconnect', _ => {
-        if (Object.keys(io.connected).length === 0) {
+        if (!io.connected) {
           // reference: https://stackoverflow.com/questions/26400595/socket-io-how-do-i-remove-a-namespace
           // namespace gets deleted from server when someone actually deletes the game
           nsp.removeAllListeners();
@@ -69,6 +69,7 @@ class Server {
       this.game.started = true;
       this.game.save().then(_ => {
         this.io.emit('receive-removal', JSON.stringify(this.game));
+        this.nsp.emit('start-game');
       });
     } else {
       this.game.messages.push(...messages);
@@ -76,6 +77,10 @@ class Server {
         messages.forEach(message => this.nsp.emit('receive-message', message));
       });
     }
+  }
+
+  kick() {
+    this.io.emit('kick-user', this.game.slug);
   }
 
   remove(username) {

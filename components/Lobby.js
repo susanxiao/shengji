@@ -51,6 +51,10 @@ export default class Lobby extends React.Component {
             this.setState({timeout: timeout});
           });
 
+          socket.on('start-game', _ => {
+            this.setState({started: true});
+          });
+
           this.setState({gameSocket: socket});
           this.setState({auth: true});
         }
@@ -78,8 +82,9 @@ export default class Lobby extends React.Component {
   }
 
   _startBar() {
+    // TODO: put this check back in; took it out for testing
     // if (this.state.game.players.length >= 4) {
-    if (!this.state.timeout) { // if we're already waiting for players to start this should not be possible
+    if (!this.state.timeout) {
       this.state.gameSocket.emit('start-bar');
       this.setState({bar: true});
       const timeout = window.setTimeout(this._endBar, 10000);
@@ -188,7 +193,7 @@ export default class Lobby extends React.Component {
           </div>
         </div>
       );
-    } else {
+    } else if (!this.state.started) {
       return (
         <div id='game-lobby'>
           <h1>{ this.state.game.name }</h1>
@@ -220,11 +225,10 @@ export default class Lobby extends React.Component {
           { this._renderBar() }
         </div>
       );
+    } else {
+      return (
+        <Platform socket={ this.state.gameSocket } />
+      );
     }
-    // } else {
-    //   return (
-    //     <Platform socket={ this.state.gameSocket } />
-    //   );
-    // }
   }
 };

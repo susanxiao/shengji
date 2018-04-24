@@ -123,12 +123,12 @@ app.post('/logout', (req, res) => {
                 });
               } else {
                 return game.save().then(_ => {
-                  req.logout();
                   res.status(200).send();
                   io.emit('receive-update', JSON.stringify(game));
                   if (gameServe.find(game._id)) {
                     gameServe.find(game._id).remove(req.user.username);
                   }
+                  req.logout();
                 });
               }
             })
@@ -278,6 +278,37 @@ app.post('/game/leave', (req, res) => {
     });
 });
 
+app.post('/game/delete', (req, res) => {
+  Game.findOneAndRemove({slug: req.body.slug}).exec()
+    .then(game => {
+      return game.players.reduce((promise, p) => {
+        return promise
+          .then(_ => Player.findOne({username: p}).exec())
+          .then(player => {
+            player.game = null;
+            return player.save();
+          });
+      }, Promise.resolve())
+        .then(_ => {
+          if (gameServe.find(game._id)) {
+            gameServe.find(game._id).kick();
+          }
+          if (io.nsps['/'+game._id]) {
+            delete io.nsps['/'+game._id];
+            gameServe.remove(game._id);
+          } else {
+            console.log('Could not remove ' + game._id + ' from namespaces');
+          }
+          io.emit('receive-removal', JSON.stringify(game));
+          res.status(200).send();
+        });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send();
+    });
+});
+
 io.on('connection', (socket) => {
   let user;
   // TODO: this is to avoid losing the user on refresh...should be a better way
@@ -372,14 +403,26 @@ io.on('connection', (socket) => {
           }
           return false;
         });
-
-        socket.emit('receive-user', JSON.stringify({
-          username: player.username,
-          roundWins: player.roundWins,
-          gameWins: player.gameWins,
-          playedWith: playedWith,
-          description: player.description
-        }));
+        if (player.game) {
+          Game.findOne({_id: player.game}, (err, game) => {
+            socket.emit('receive-user', JSON.stringify({
+              username: player.username,
+              roundWins: player.roundWins,
+              gameWins: player.gameWins,
+              playedWith: playedWith,
+              description: player.description,
+              game: game.started ? game.slug : ''
+            }));
+          })
+        } else {
+          socket.emit('receive-user', JSON.stringify({
+            username: player.username,
+            roundWins: player.roundWins,
+            gameWins: player.gameWins,
+            playedWith: playedWith,
+            description: player.description
+          }));
+        }
       }
     });
   });
