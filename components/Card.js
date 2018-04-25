@@ -8,17 +8,13 @@ export default class Card extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      card: this.props.card,
-      suit: this.props.suit
-    };
+    this.state = this.props;
+  }
 
-    if (this.props.suit === SUIT.DIAMONDS || this.props.suit === SUIT.HEARTS || this.props.suit === JOKER.SUIT.BIG) {
-      this.state.color = 'red';
-    } else {
-      this.state.color = 'black';
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      this.setState(this.props);
     }
-
   }
 
   _renderCorner() {
@@ -36,7 +32,7 @@ export default class Card extends React.Component {
 
   render() {
     return (
-      <div className={ 'card ' + this.state.color }>
+      <div className={ 'card ' + this.state.suit.color } style={{transform: 'translateX('+this.state.shift+'px)'}}>
         <div className='topLeft'>
           { this._renderCorner() }
         </div>

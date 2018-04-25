@@ -227,7 +227,7 @@ export default class Lobby extends React.Component {
       );
     } else {
       return (
-        <Platform socket={ this.state.gameSocket } />
+        <Platform username={this.props.username} socket={ this.state.gameSocket } />
       );
     }
   }

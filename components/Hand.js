@@ -1,21 +1,27 @@
 const React = require('react');
-
-const CARD = require('../utils/enums/card.js');
-const SUIT = require('../utils/enums/suit.js');
-const JOKER = require('../utils/enums/joker.js');
-
 import Card from './Card.js';
 
 export default class Hand extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = this.props
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps != this.props) {
+      this.setState(this.props);
+    }
   }
 
   render() {
     return (
       <div className='hand'>
-        <Card card={ CARD.TWO } suit={ SUIT.DIAMONDS } />
-        <Card card={ CARD.THREE } suit={ SUIT.CLUBS } />
+        {
+          this.state.cards.map((card, index) => (
+            <Card card={ card.card } suit={ card.suit } shift={ -140*index } />
+          ))
+        }
       </div>
     );
   }

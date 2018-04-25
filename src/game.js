@@ -1,9 +1,10 @@
 require('./db.js');
 const mongoose = require('mongoose');
+const Shengji = require('../utils/shengji.js');
 const Game = mongoose.model('Game');
 const Player = mongoose.model('Player');
 const all = [];
-
+const loaded = [];
 class Server {
   constructor(io, nsp, game) {
     this.checkPlayers = this.checkPlayers.bind(this);
@@ -28,9 +29,19 @@ class Server {
       socket.on('end-queue', this.checkPlayers);
 
       socket.on('start-queue', username => {
-        this.players.push(username);
+        this.players.push({username: username, socket: socket});
         if (this.players.length === this.game.players.length) {
           this.checkPlayers();
+        }
+      });
+
+      socket.on('loaded', _ => {
+        if (!loaded.includes(socket)) {
+          loaded.push(socket);
+          if (loaded.length === this.players.length) {
+            this.shengji = new Shengji(this.players, this.nsp, this.game);
+            this.shengji.setup();
+          }
         }
       });
 
@@ -58,7 +69,7 @@ class Server {
     let canStart = true;
     const messages = [];
     this.game.players.forEach(player => {
-      if (!this.players.includes(player)) {
+      if (!this.players.some(p => p.username === player)) {
         const message = player + ' failed to start.';
         messages.push(message);
         canStart = false;

@@ -12,13 +12,13 @@ export default class ChatBox extends React.Component {
 
     this.props.socket.on('receive-message-all', data => {
       const messages = JSON.parse(data);
-      this.setState({messages: messages});
+      this.setState({messages: messages}, this._scrollToBottom);
     });
 
     this.props.socket.on('receive-message', data => {
       const messages = this.state.messages;
       messages.push(data);
-      this.setState({messages: messages});
+      this.setState({messages: messages}, this._scrollToBottom);
     });
 
     this._handleMessage = this._handleMessage.bind(this);
@@ -36,7 +36,7 @@ export default class ChatBox extends React.Component {
   _handleKeyPress(evt) {
     if (evt.key === 'Enter') {
       this.props.socket.emit('add-message', this.props.username + ': ' + this.state.message);
-      this.setState({message: ''}, this._scrollToBottom);
+      this.setState({message: ''});
     }
   }
 
