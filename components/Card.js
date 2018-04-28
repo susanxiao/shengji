@@ -8,23 +8,40 @@ export default class Card extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this.props;
+    this.state = {
+      card: this.props.card,
+      selected: false,
+      shift: this.props.shift
+    };
+
+    this._onClick = this._onClick.bind(this);
+    this.toggleSelect = this.toggleSelect.bind(this);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
-      this.setState(this.props);
+      this.setState({card: this.props.card});
+      this.setState({shift: this.props.shift});
     }
+  }
+
+  _onClick() {
+    this.props.selectHandler(this, !this.state.selected);
+    this.toggleSelect();
+  }
+
+  toggleSelect() {
+    this.setState({selected: !this.state.selected});
   }
 
   _renderCorner() {
     return (
       <Fragment>
         <div className='code'>
-        { this.state.card.code }
+        { this.state.card.card.code }
         </div>
         <div className='code'>
-        { this.state.suit.code }
+        { this.state.card.suit.code }
         </div>
       </Fragment>
     );
@@ -32,7 +49,11 @@ export default class Card extends React.Component {
 
   render() {
     return (
-      <div className={ 'card ' + this.state.suit.color } style={{transform: 'translateX('+this.state.shift+'px)'}}>
+      <div
+        className={ 'card ' + this.state.card.suit.color + (this.state.selected ? ' selected' : '') }
+        style={{transform: 'translateX('+this.state.shift+'px)'}}
+        onClick={ this._onClick }
+      >
         <div className='topLeft'>
           { this._renderCorner() }
         </div>

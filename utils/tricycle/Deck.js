@@ -50,7 +50,7 @@ class Deck { // large deck, contains all cards for the game
               if (numCards - index > numBottom) {
                 current.player.hand.add(card, trumpCardKey);
                 return new Promise(resolve => setTimeout(resolve, 1000)) // pause for 1 second
-                  .then(_ => current.player.printHand())
+                  .then(_ => current.player.updateHand())
                   .then(_ => {
                     current = current.next;
                     return bottom;

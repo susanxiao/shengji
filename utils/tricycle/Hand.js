@@ -4,24 +4,33 @@ class Hand {
   constructor() {
     this.totalCards = 0;
     this.cards = {
-      CLUBS: {}, // key = card key, value = Elem()
-      DIAMONDS: {},
-      HEARTS: {},
-      SPADES: {},
-      trumpCards: {
-        JOKERS: {}, // key = BIG/SMALL, value = Elem()
-        CARDS: {} // key = card suit, value = Elem()
-      }
+      CLUBS: [],
+      DIAMONDS: [],
+      HEARTS: [],
+      SPADES: [],
+      JOKER: [],
+      TRUMP: []
     };
   }
 
   add(card, trumpCardKey) {
-    const [location, key] = this.getLocation(card, trumpCardKey);
-    if (typeof location[key] === 'undefined') {
-      location[key] = new Element(card);
-    } else {
-      location[key].add();
+    let location = this.cards[card.suitKey];
+    if (typeof card.cardKey === 'undefined') {
+      location = this.cards.JOKER;
+    } else if (card.card.code === trumpCardKey) {
+      location = this.cards.TRUMP;
     }
+    if (!location.some(element => {
+      if (element.card.card === card.card) {
+        element.add();
+        return true;
+      }
+      return false;
+    })) {
+      location.push(new Element(card));
+    }
+
+    location.sort((c1, c2) => location === this.cards.JOKER ? c1.card.suit.rank - c2.card.suit.rank : c1.card.card.rank - c2.card.card.rank);
 
     this.totalCards++;
   }

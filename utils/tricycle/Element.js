@@ -16,14 +16,6 @@ class Element {
       return (this.size === 0);
     }
   }
-
-  toArray() {
-    const cards = [];
-    for (let i = 0; i < this.size; i++) {
-      cards.push(this.card);
-    }
-    return cards;
-  }
 }
 
 module.exports = Element;

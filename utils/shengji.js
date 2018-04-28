@@ -77,19 +77,26 @@ class Shengji {
   }
 
   startRound() {
-    console.log('start round');
     return new Promise(resolve => {
       this.current = this.host; // host starts the first turn
       this.points = 0;
       this.multiplier = 0;
-      this.trumpCardKey = this.host.player.level; //  TODO: emit this information
+      this.trumpCardKey = this.host.player.level;
+      this.nsp.emit('update-trump-card', this.trumpCardKey);
       this.deck.shuffle();
       resolve();
-    }).then(_ => { // TODO: if user chooses a trump card
+    }).then(_ => {
+      this.players.iterateWith(player => player.socket.on('update-trump-suit', data => {
+        const {username, suit} = JSON.parse(data);
+        if (!this.trumpSuitKey) {
+          this.trumpSuitKey = suit;
+          this.nsp.emit('update-trump-suit', suit);
+          this.write(username + ' called the suit ' + suit) + '.';
+        }
+      }));
       return this.deck.deal(this.players, this.trumpCardKey);
     });
   }
-
 }
 
 module.exports = Shengji;

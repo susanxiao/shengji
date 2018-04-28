@@ -256,19 +256,54 @@ a:hover {
 #platform .hand {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
   flex-wrap: nowrap;
+  height: 100%;
 }
 
 #platform > #game-platform {
+  min-width: 70%;
   width: 70%;
   max-width: 70%;
   margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#platform > #game-platform > #information {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+#platform > #game-platform #trump-information {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+#platform > #game-platform #interact-information {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#platform > #game-platform #trump-suit, #platform > #game-platform #trump-card {
+  margin: 5px 10px;
 }
 
 #platform #own-hand {
   width: 100%;
+  height: 300px;
   overflow-x: auto;
+  border: 1px solid black;
 }
 
 #platform > #chatbox {
@@ -441,6 +476,10 @@ input[type='submit']:hover, .button:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.card.selected {
+  border: 2px solid black;
 }
 
 .card > .bottomRight {
