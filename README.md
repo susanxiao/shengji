@@ -5,13 +5,13 @@
 Shengji is a Chinese point-based card game I learned from friends and family. Rules and details can be found on [Wikipedia](https://en.wikipedia.org/wiki/Sheng_ji), although house rules and terminology will be updated in here later on regarding the actual implementation, because there is a lot of setup to it.
 
 
-This project is intended to be a live interaction between multiple clients (players) and the server. Users can log in and view their own/others stats (i.e. rounds won, games won). Games are created/displayed from the home page. Users wait in a game's lobby--users join a game with/without a password. The game can start after 4+ players have joined, and users can choose the mode (regular Shengji or an alternative version, Zhaopengyou) as well as the number of decks. Games can be "paused" between rounds, and users can be in multiple games at once, but once a Game is created, the players cannot change. Additionally, a paused Game would not start unless all players are joined in the group lobby.
+This project is intended to be a live interaction between multiple clients (players) and the server. Users can log in and view their own/others stats (i.e. rounds won, games won). Games are created/displayed from the home page. Users wait in a game's lobby--users join a game with/without a password. The game can start after 4+ players have joined, and users can choose the mode (regular Shengji or an alternative version, Zhaopengyou) as well as the number of decks. Games can be "paused" between rounds, but once a Game is created, the players cannot change. Users can only be in one game at a time. Additionally, a paused Game would not start unless all players are joined in the group lobby.
 
 ## Data Model
 
 The application will store Players, and Games, both related by references.
-* Players can have multiple Games
-* Games will have multiple Players, the ids of which are in an embedded object
+* Players can have one Game, stored as an ID
+* Games will have multiple Players, a list of usernames
 
 An Example Player:
 
@@ -22,7 +22,7 @@ An Example Player:
   description: 'hi, i\'m ultimategamer and i like to play this game a lot. also i\'m ultimate at it.'
   roundWins: 100
   gameWins: 50
-  games: // an array of references to Game documents
+  gams: // reference to a Game document
   usersPlayedWith: [{
     user: // reference to Player document
     times: 1,
@@ -43,6 +43,7 @@ An Example Game:
     user: // a reference to a Player document
     level: // the level they are on within the game
   }],
+  messages: [],
   host: // the host of the next round
   slug: 'game-for-n00bs' // generated
 }
@@ -123,10 +124,7 @@ An Example Game:
 * (5 points) Integrate user authentication
     * use passport for user authentication
 * (3 points) Perform client side form validation custom JavaScript
-    * during the game, there are some rules to your play relative to the first play of the turn
-      * e.g. if you have cards in the suit they played, you must play cards in that suit
-      * e.g. if the first player played a pair of hearts and you have a pair hearts, you must play them
-      * these rules will be added to the README later on
+    * client-side validation for creating a game
 * (4 points) Use ReactJS
     * use ReactJS as the frontend framework
 
